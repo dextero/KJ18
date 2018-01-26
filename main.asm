@@ -35,10 +35,11 @@ enter_standard_bitmap_mode:
     ; https://www.c64-wiki.com/wiki/Standard_Bitmap_Mode
     lda CONTROL_REG_1
     and #%10111111 ; clear bit 6
+    ora #%00100000 ; set bit 5
     sta CONTROL_REG_1
 
     lda CONTROL_REG_2
-    ora #%00100000 ; set bit 5
+    and #%11011111 ; clear bit 5
     sta CONTROL_REG_2
 
     rts
