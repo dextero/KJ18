@@ -4,6 +4,7 @@ default: main.prg
 
 %.prg: %.asm
 	$(HOME)/tools/dasm/dasm.Linux.x86 $^ -o$@
+	@ls -l $@
 
 clean:
 	rm -f *.prg
