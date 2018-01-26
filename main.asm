@@ -12,12 +12,17 @@ SCREEN = $400
 SCREEN_LO = $00
 SCREEN_HI = $04
 
+SCREEN_END_LO = $e8
+SCREEN_END_HI = $07
+
 SCREEN_PTR_LO = $2B
 SCREEN_PTR_HI = $2C
 SCREEN_LINE_ITERATOR = $2D
 
-SCREEN_LINE_SIZE_B = 40
-SCREEN_NUM_LINES = 25
+SCREEN_LINE_SIZE_B = 320/8
+SCREEN_NUM_LINES = 200/8
+
+RASTER_COUNTER = $d012
 
 
 main:
@@ -25,10 +30,104 @@ main:
 
     ldy #1
 
+    jsr clear_screen
 loop:
     jsr draw_vertical_line
-    inc BG_COLOR
+    jsr sync_screen
+    ;inc BG_COLOR
     jmp loop
+
+
+sync_screen:
+    lda RASTER_COUNTER
+    cmp #$00
+    bne sync_screen
+    rts
+
+
+screen_ptr_reset:
+    lda #SCREEN_LO
+    sta SCREEN_PTR_LO
+    lda #SCREEN_HI
+    sta SCREEN_PTR_HI
+    rts
+
+
+screen_ptr_valid:
+    ; set A to 1 if SCREEN_PTR is still inside screen region
+    ; or to 0 if it is not
+    ; NOTE: reports addresses below SCREEN as correct
+    lda SCREEN_PTR_HI
+    cmp #SCREEN_END_HI
+
+    ; unsigned compare!
+    beq screen_ptr_valid_maybe
+    bcc screen_ptr_valid_yup
+
+screen_ptr_valid_maybe:
+    lda SCREEN_PTR_LO
+    cmp #SCREEN_END_LO
+
+    bcc screen_ptr_valid_yup
+
+screen_ptr_valid_nope:
+    lda #0
+    rts
+
+screen_ptr_valid_yup:
+    lda #1
+    rts
+
+
+screen_ptr_next_line:
+    ; advance SCREEN_PTR to next line
+    ;
+    ; set A to 1 if the line is still inside screen region
+    ; or to 0 if there are no more lines, in which case
+    ; SCREEN_PTR is invalid
+
+    lda SCREEN_PTR_LO
+    ; WHAT THE FUCK WHY DOES IT ONLY WORK WITH THAT -1
+    adc #SCREEN_LINE_SIZE_B-1
+    sta SCREEN_PTR_LO
+    bcc screen_ptr_next_line_no_inc_hi
+
+    inc SCREEN_PTR_HI
+
+screen_ptr_next_line_no_inc_hi:
+    jsr screen_ptr_valid
+    rts
+
+
+clear_screen:
+    ; args: X = zero-page address to number of bytes to clear
+
+    jsr screen_ptr_reset
+    
+    lda #0
+
+    ; while (screen_ptr_valid(screen_ptr)) {
+clear_screen_row_loop:
+    jsr screen_ptr_valid
+    cmp #1
+    bne clear_screen_end
+
+    lda #0
+    ldy #SCREEN_LINE_SIZE_B
+    ;     while (y-- > 0) {
+clear_screen_col_loop:
+    ;         *screen_ptr[y] = A;
+    dey
+    sta (SCREEN_PTR_LO),Y
+    ;    }
+    bne clear_screen_col_loop
+
+    ;    screen_ptr += line_size;
+    jsr screen_ptr_next_line
+    jmp clear_screen_row_loop
+    ; }
+clear_screen_end:
+    rts
 
 
 enter_standard_bitmap_mode:
@@ -47,12 +146,7 @@ enter_standard_bitmap_mode:
 
 draw_vertical_line:
     ; args: Y = X coordinate * 8
-
-    ; setup screen ptr
-    lda #SCREEN_LO
-    sta SCREEN_PTR_LO
-    lda #SCREEN_HI
-    sta SCREEN_PTR_HI
+    jsr screen_ptr_reset
 
     ; i = 0
     lda #0
