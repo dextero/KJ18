@@ -15,6 +15,7 @@ split_screen:
 begin_raster:
 	jsr multicolor_mode
 
+    jsr clear_screen
     jsr draw_tracks
 	
 	; chaining

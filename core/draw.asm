@@ -1,12 +1,56 @@
-; fill .size bytes starting from MEMSET_ADDR with .value
+; fill Y bytes starting from MEMSET_ADDR with A value
 ; A - value
-; Y - size
+; Y - size (0 is interpreted as 256!)
 memset subroutine
 
 .memset_loop:
-    sta (MEMSET_ADDR_LO),y
     dey
+    sta (MEMSET_ADDR_LO),y
     bne .memset_loop
+
+    rts
+
+
+
+; fill MEMSET_SIZE bytes starting from MEMSET_ADDR with A value
+; A = value
+memset16 subroutine
+    pha
+    lda MEMSET_SIZE_HI
+    cmp #0
+    beq memset16_final_block
+
+    ; memset(MEMSET_ADDR, A, 0x80);
+    pla
+    ldy #0
+    jsr memset
+
+    inc MEMSET_ADDR_HI
+    dec MEMSET_SIZE_HI
+
+    jmp memset16
+
+memset16_final_block:
+    pla
+    ldy MEMSET_SIZE_LO
+    jsr memset
+
+    rts
+
+; zero-initializes SCREEN
+clear_screen subroutine
+    lda #<SCREEN
+    sta MEMSET_ADDR_LO
+    lda #>SCREEN
+    sta MEMSET_ADDR_HI
+
+    lda #<SCREEN_SIZE
+    sta MEMSET_SIZE_LO
+    lda #>SCREEN_SIZE
+    sta MEMSET_SIZE_HI
+
+    lda #0
+    jsr memset16
 
     rts
 
@@ -135,9 +179,9 @@ draw_horizontal_lines:
 
 ; set SCREEN_PTR to point to the first SCREEN row
 screen_ptr_reset:
-    lda #SCREEN_LO
+    lda #<SCREEN
     sta SCREEN_PTR_LO
-    lda #SCREEN_HI
+    lda #>SCREEN
     sta SCREEN_PTR_HI
     rts
 
@@ -147,7 +191,7 @@ screen_ptr_valid:
     ; or to 0 if it is not
     ; NOTE: reports addresses below SCREEN as correct
     lda SCREEN_PTR_HI
-    cmp #SCREEN_END_HI
+    cmp #>SCREEN_END
 
     ; unsigned compare!
     beq screen_ptr_valid_maybe
@@ -155,7 +199,7 @@ screen_ptr_valid:
 
 screen_ptr_valid_maybe:
     lda SCREEN_PTR_LO
-    cmp #SCREEN_END_LO
+    cmp #<SCREEN_END
 
     bcc screen_ptr_valid_yup
 
