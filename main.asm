@@ -18,6 +18,7 @@ SCREEN_END_HI = $07
 SCREEN_PTR_LO = $2B
 SCREEN_PTR_HI = $2C
 SCREEN_LINE_ITERATOR = $2D
+SCREEN_LINE_SKEW = $2E
 
 SCREEN_LINE_SIZE_B = 320/8
 SCREEN_NUM_LINES = 200/8
@@ -153,6 +154,59 @@ abs:
     adc #1
 
 abs_ret:
+    rts
+
+
+draw_diagonal_line:
+    ; args: Y = X coordinate * 8 [unsigned]
+    ;       X = skew [signed]; 0 = vertical; -X /; +x \
+
+    jsr screen_ptr_reset
+
+    stx SCREEN_LINE_SKEW
+
+    ; x = abs(x)
+    ; original signed skew in SCREEN_LINE_SKEW
+    txa
+    jsr abs
+    tax
+    sta SCREEN_LINE_ITERATOR ; skew counter
+
+    ; while (screen_ptr_valid(screen_ptr)) {
+draw_diagonal_line_loop:
+    jsr screen_ptr_valid
+    cmp #1
+    bne draw_diagonal_line_end
+
+    dec SCREEN_LINE_ITERATOR
+    bne draw_diagonal_line_loop_no_skew
+
+    ; skew by 1
+    lda #0
+    cmp SCREEN_LINE_SKEW
+    beq draw_diagonal_line_loop_no_skew
+    bpl draw_diagonal_line_loop_skew_left
+
+    ; skew right, reset skew counter
+    iny
+    stx SCREEN_LINE_ITERATOR
+    jmp draw_diagonal_line_loop_no_skew
+
+draw_diagonal_line_loop_skew_left:
+    ; skew left, reset skew counter
+    dey
+    stx SCREEN_LINE_ITERATOR
+    jmp draw_diagonal_line_loop_no_skew
+
+draw_diagonal_line_loop_no_skew:
+    lda #$ff
+    sta (SCREEN_PTR_LO),Y
+
+    ;    screen_ptr += line_size;
+    jsr screen_ptr_next_line
+    jmp draw_diagonal_line_loop
+    ; }
+draw_diagonal_line_end:
     rts
 
 
