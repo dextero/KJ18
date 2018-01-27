@@ -115,5 +115,14 @@ loop:
 
 speed_msg .byte "SPEED: ";
 
-    org $2000
-    incbin "content/gear_knob.spr"
+    ;org $2000
+    ;incbin "content/gear_knob.spr"
+
+    org BITMAP
+    ; set bitmap to 01010101 pattern
+    ; this way it is overridden with SCREEN
+    ; 00 - draw BITMAP
+    ; 01 - draw SCREEN (color = high nibble of SCREEN pixel)
+    ; 10 - draw SCREEN (color = low nibble of SCREEN pixel)
+    ; 11 - draw SCREEN (get color from COLOR_RAM[pixel])
+    ds BITMAP_SIZE,$aa
