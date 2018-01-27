@@ -101,9 +101,10 @@ QUOTIENT = NUMERATOR
 ; /methods/   ===========
 
 main: 
-
+    
     jsr creators_screen
     jsr split_screen
+    jsr play_music
 loop:
     
 

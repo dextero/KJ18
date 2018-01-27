@@ -30,6 +30,9 @@ begin_raster:
 last_raster:
 	jsr text_mode
 
+	; muzig
+	jsr $1003
+
 
 	; chaining
 	lda #<begin_raster
