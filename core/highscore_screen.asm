@@ -1,7 +1,7 @@
 ;=========================
 ; /entry/ ================
 
-title_screen:
+highscore_screen:
     ; set colors
     lda #TITLE_BCG
     sta $d020
@@ -25,21 +25,21 @@ title_screen:
     sta $d018
 
     ldx #$00
-write_title:      
-    lda    title_msg,x
+.write_title:      
+    lda    highscore_msg,x
     jsr    $ffd2
     inx
-    cpx    #title_msg_size
-    bne    write_title
+    cpx    #highscore_msg_size
+    bne    .write_title
 
     ldx #$00
 
-setcolor:  
+.setcolor:  
     lda #TITLE_BCG
     sta $d800,x
     inx
-    cpx #title_msg_size
-    bne setcolor
+    cpx #highscore_msg_size
+    bne .setcolor
 
     jsr wait_for_space
 
