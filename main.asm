@@ -27,7 +27,7 @@ RASTER_COUNTER = $d012
 
 
 main:
-    jsr enter_standard_bitmap_mode
+    jsr enter_multicolor_bitmap_mode
 
     jsr clear_screen
 loop:
@@ -134,15 +134,15 @@ clear_screen_end:
     rts
 
 
-enter_standard_bitmap_mode:
-    ; https://www.c64-wiki.com/wiki/Standard_Bitmap_Mode
+enter_multicolor_bitmap_mode:
+    ; https://www.c64-wiki.com/wiki/Multicolor_Bitmap_Mode
     lda CONTROL_REG_1
     and #%10111111 ; clear bit 6
     ora #%00100000 ; set bit 5
     sta CONTROL_REG_1
 
     lda CONTROL_REG_2
-    and #%11011111 ; clear bit 5
+    ora #%00010000 ; set bit 4
     sta CONTROL_REG_2
 
     rts
