@@ -9,36 +9,21 @@ timer_reset:
 
 
 timer_get_elapsed:
-    lda JIFFIES_HI
+    lda JIFFIES_LO
     ldx JIFFIES_MI
-    ldy JIFFIES_LO
+    ldy JIFFIES_HI
 
     sec
-    sbc TIMER_START_JIFFIES_HI
-    ; if carry gets set, we have measured 24h+ interval, so screw it
-
-    sta TIMER_ELAPSED_MINUTES ; temporarily jiffies
-
+    sbc TIMER_START_JIFFIES_LO
+    sta TIMER_ELAPSED_CENTISECONDS ; temporarily jiffies
     txa
-    sec
-    sbc JIFFIES_MI
-    bcc .timer_get_elapsed_no_mi_carry
-
-    dec TIMER_ELAPSED_MINUTES
-
-.timer_get_elapsed_no_mi_carry:
-    sta TIMER_ELAPSED_SECONDS ; temporarily jiffies
-
+    sbc TIMER_START_JIFFIES_MI
+    sta TIMER_ELAPSED_SECONDS
     tya
-    sec
-    sbc JIFFIES_LO
-    bcc .timer_get_elapsed_no_lo_carry
+    sbc TIMER_START_JIFFIES_HI
+    sta TIMER_ELAPSED_MINUTES
 
-    dec TIMER_ELAPSED_SECONDS
-
-.timer_get_elapsed_no_lo_carry:
-    sta TIMER_ELAPSED_CENTISECONDS
-
+    ; if carry gets set, we have measured 24h+ interval, so screw it
     ; at this point TIMER_ELAPSED_* contains elapsed time in jiffies
 
     ; convert to seconds
