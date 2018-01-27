@@ -126,6 +126,7 @@ draw_tracks:
     ldx #LINE_SKEW
     jsr draw_diagonal_line
 
+    lda SCREEN_HLINE_OFFSET
     sta SCREEN_HLINE_ROW
     lda #LINE_SKEW+1
     sta SCREEN_HLINE_STRIDE
