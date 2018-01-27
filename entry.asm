@@ -162,6 +162,7 @@ rest:
     include "core/calculate_speed.asm"
     include "core/update_gearbox.asm"
     include "core/draw_speed.asm"
+    include "core/timer.asm"
 
 ; =======================
 ; /data/ ================
