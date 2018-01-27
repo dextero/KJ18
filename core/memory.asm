@@ -27,14 +27,13 @@ cpyspr:
 .value SET {2}
 .size SET {3}
 
-    lda .value
-    ldx .size
+    lda #.value
+    ldx #.size
 
-memset_loop:
+.memset_loop:
     sta .addr,x
     dex
-    bne memset_loop
-    rts
+    bne .memset_loop
 
     endm
 
