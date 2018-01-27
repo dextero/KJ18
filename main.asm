@@ -3,38 +3,6 @@
 
     include "core/memory.asm"
 
-    mac draw_horizontal_line
-
-.row SET {1}
-.col SET {2}   ; increments of 8
-.width SET {3} ; 8x8 blocks
-
-    jsr screen_ptr_reset
-
-    ldy #.row
-.skip_row:
-    dey
-    beq .draw
-    jsr screen_ptr_next_line
-    cmp #1
-    bne .abort ; invalid row
-    jsr screen_ptr_next_line
-    
-.draw:
-    lda #.col
-    adc SCREEN_PTR_LO
-    sta MEMSET_ADDR_LO
-    lda #0
-    adc SCREEN_PTR_HI
-    sta MEMSET_ADDR_HI
-
-    lda #$ff
-    ldy #.width
-    jsr memset
-
-.abort:
-    endm
-
 
 BG_COLOR = $d021
 
@@ -81,7 +49,10 @@ loop:
     ldx #2
     jsr draw_diagonal_line
 
-    draw_horizontal_line #10, #10, #20
+    ldx #10
+    ldy #10
+    lda #20
+    jsr draw_horizontal_line
 
     jsr sync_screen
     ;inc BG_COLOR
@@ -93,6 +64,42 @@ sync_screen:
     cmp #$00
     bne sync_screen
     rts
+
+
+draw_horizontal_line:
+    ; Y - row
+    ; X - col
+    ; A - width
+
+    pha
+    jsr screen_ptr_reset
+
+.skip_row:
+    dey
+    beq .draw
+    jsr screen_ptr_next_line
+    cmp #1
+    bne .abort ; invalid row
+    jsr screen_ptr_next_line
+
+.draw:
+    txa
+    adc SCREEN_PTR_LO
+    sta MEMSET_ADDR_LO
+    lda #0
+    adc SCREEN_PTR_HI
+    sta MEMSET_ADDR_HI
+
+    pla
+    tay
+    lda #$ff
+    jsr memset
+    rts
+
+.abort:
+    pla
+    rts
+
 
 
 screen_ptr_reset:
