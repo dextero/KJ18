@@ -106,11 +106,13 @@ main:
     jsr split_screen
     jsr play_music
 loop:
-    
+    jsr read_space
+    jsr update_gearbox
 
     jsr clear_screen
     jsr sync_screen
     jsr draw_tracks
+	jsr draw_speed
     
     jmp loop
     rts
@@ -129,6 +131,8 @@ loop:
     include "core/play_music.asm"
     include "core/draw.asm"
     include "core/math.asm"
+    include "core/update_gearbox.asm"
+    include "core/draw_speed.asm"
 
 ; =======================
 ; /data/ ================
@@ -137,7 +141,7 @@ loop:
     INCBIN "content/music.sid"
 
    ; org $2000
-   ; incbin "content/gear_knob.spr"
+   ; incbin "content/sprite.spr"
 
     org BITMAP
     ; set bitmap to 01010101 pattern
