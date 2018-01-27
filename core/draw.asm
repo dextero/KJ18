@@ -149,14 +149,12 @@ draw_horizontal_lines:
     lda #TRACK_UPPER_X
 
     ; if carry clear, sbc subtracts extra 1
-    ; we actually want this extra -1 here
-    clc ; fucking sbc how does it work
+    sec ; fucking sbc how does it work
     sbc QUOTIENT
     tax
 
     ; A = TRACK_UPPER_WIDTH + 2 * (Y / LINE_SKEW)
-    ; dunno lol @ -1
-    lda #TRACK_UPPER_WIDTH-1
+    lda #TRACK_UPPER_WIDTH
     clc
     adc QUOTIENT ; this should never overflow
     adc QUOTIENT
