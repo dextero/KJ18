@@ -144,6 +144,18 @@ enter_standard_bitmap_mode:
     rts
 
 
+abs:
+    cmp #0
+    bpl abs_ret
+
+    eor #$ff ; poor man's ~x
+    clc
+    adc #1
+
+abs_ret:
+    rts
+
+
 draw_vertical_line:
     ; args: Y = X coordinate * 8
     jsr screen_ptr_reset
