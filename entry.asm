@@ -107,6 +107,7 @@ main:
     
 loop:
 
+    jsr update_gearbox
     jsr calculate_speed
     jsr clear_screen
     jsr update_tracks
@@ -123,6 +124,7 @@ loop:
     include "core/draw.asm"
     include "core/math.asm"
     include "core/calculate_speed.asm"
+    include "core/update_gearbox.asm"
 
 ; =======================
 ; /data/ ================
