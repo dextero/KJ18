@@ -3,6 +3,39 @@
 
     include "core/memory.asm"
 
+    mac draw_horizontal_line
+
+.row SET {1}
+.col SET {2}   ; increments of 8
+.width SET {3} ; 8x8 blocks
+
+    jsr screen_ptr_reset
+
+    ldy #.row
+.skip_row:
+    dey
+    beq .draw
+    jsr screen_ptr_next_line
+    cmp #1
+    bne .abort ; invalid row
+    jsr screen_ptr_next_line
+    
+.draw:
+    lda #.col
+    adc SCREEN_PTR_LO
+    sta MEMSET_ADDR_LO
+    lda #0
+    adc SCREEN_PTR_HI
+    sta MEMSET_ADDR_HI
+
+    lda #$ff
+    ldy #.width
+    jsr memset
+
+.abort:
+    endm
+
+
 BG_COLOR = $d021
 
 CONTROL_REG_1 = $d011
@@ -25,8 +58,8 @@ SCREEN_PTR_HI = $2C
 SCREEN_LINE_ITERATOR = $2D
 SCREEN_LINE_SKEW = $2E
 
-MEMSET_SCRATCH_LO = $2F
-MEMSET_SCRATCH_HI = $30
+MEMSET_ADDR_LO = $2F
+MEMSET_ADDR_HI = $30
 
 SCREEN_LINE_SIZE_B = 320/8
 SCREEN_NUM_LINES = 200/8
@@ -47,6 +80,9 @@ loop:
     ldy #22
     ldx #2
     jsr draw_diagonal_line
+
+    draw_horizontal_line #10, #10, #20
+
     jsr sync_screen
     ;inc BG_COLOR
     jmp loop
@@ -263,26 +299,18 @@ draw_vertical_line_skip_inc:
     rts
 
 
-draw_horizontal_line subroutine
-    ; args: Y = row
-    ;       X = column * 8 [unsigned]
+memset subroutine
+    ; fill .size bytes starting from MEMSET_ADDR with .value
+    ; A - value
+    ; Y - size
 
-    jsr screen_ptr_reset
-
-    iny
-.skip_row:
+.memset_loop:
+    sta (MEMSET_ADDR_LO),y
     dey
-    beq .draw
-    jsr screen_ptr_next_line
-    cmp #1
-    bne .ret ; invalid row
-    jsr screen_ptr_next_line
-    
-.draw:
-    ;memset 
+    bne .memset_loop
 
-.ret:
     rts
+
 
 
     org BITMAP
