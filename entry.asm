@@ -90,6 +90,8 @@ TIMER_ELAPSED_JIFFIES_HI = $3c
 
 SCREEN_LINE_COLOR = $3d
 
+FINISH_LINE_POS_LO = $0000
+FINISH_LINE_POS_HI = $0004
 
 ; reuse memory - these are never used while SCREEN_LINE_* vars are
 SCREEN_HLINE_ROW = SCREEN_LINE_SKEW
@@ -118,6 +120,7 @@ QUOTIENT = NUMERATOR
     lda #GEAR_LEVER_CENTER_Y
     sta GEAR_LEVER_Y
 
+    jsr reset_distance_traveled
 
 ; =======================
 ; /methods/   ===========
@@ -132,6 +135,7 @@ main:
 
     jsr clear_screen
     jsr draw_tracks
+    jsr timer_reset
 loop:
     ;handle movement
     jsr read_space
@@ -146,7 +150,9 @@ rest:
     jsr update_tracks
     jsr draw_speed
     
-    jmp loop
+    jsr is_finish_line_reached
+    cmp #1
+    bne loop
 
     jsr highscore_screen
 
@@ -172,6 +178,7 @@ rest:
     include "core/timer.asm"
     include "core/wait_for_space.asm"
     include "core/highscore_screen.asm"
+    include "core/update_distance_traveled.asm"
 
 ; =======================
 ; /data/ ================
