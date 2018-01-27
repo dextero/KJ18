@@ -29,11 +29,14 @@ RASTER_COUNTER = $d012
 main:
     jsr enter_standard_bitmap_mode
 
-    ldy #1
-
     jsr clear_screen
 loop:
-    jsr draw_vertical_line
+    ldy #18
+    ldx #-2
+    jsr draw_diagonal_line
+    ldy #22
+    ldx #2
+    jsr draw_diagonal_line
     jsr sync_screen
     ;inc BG_COLOR
     jmp loop
@@ -104,7 +107,7 @@ clear_screen:
     ; args: X = zero-page address to number of bytes to clear
 
     jsr screen_ptr_reset
-    
+
     lda #0
 
     ; while (screen_ptr_valid(screen_ptr)) {
