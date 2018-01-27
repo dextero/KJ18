@@ -80,7 +80,7 @@ draw_horizontal_line:
     jsr screen_ptr_next_line
     cmp #1
     bne .abort ; invalid row
-    jsr screen_ptr_next_line
+    jmp .skip_row
 
 .draw:
     txa
