@@ -106,13 +106,18 @@ main:
     jsr split_screen
     jsr play_music
 loop:
+
+	;handle movement
     jsr read_space
+	lda SPACE_STATE
+	beq rest 
     jsr update_gearbox
+rest:
 
     jsr clear_screen
     jsr sync_screen
     jsr draw_tracks
-	jsr draw_speed
+    jsr draw_speed
     
     jmp loop
     rts
@@ -154,8 +159,6 @@ loop:
 
     org    $5FFE
     incbin "content/creators_screen.prg"
-
-
 
    
 speed_msg .byte "SPEED: ";
