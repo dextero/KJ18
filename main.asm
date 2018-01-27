@@ -49,9 +49,9 @@ loop:
     ldx #2
     jsr draw_diagonal_line
 
-    ldx #10
-    ldy #10
-    lda #20
+    ldx #5
+    ldy #7
+    lda #3
     jsr draw_horizontal_line
 
     jsr sync_screen
@@ -74,15 +74,15 @@ draw_horizontal_line:
     pha
     jsr screen_ptr_reset
 
-.skip_row:
+.draw_horizontal_line_skip_row:
     dey
-    beq .draw
+    beq .draw_horizontal_line_draw
     jsr screen_ptr_next_line
     cmp #1
-    bne .abort ; invalid row
-    jmp .skip_row
+    bne .draw_horizontal_line_ret ; invalid row
+    jmp .draw_horizontal_line_skip_row
 
-.draw:
+.draw_horizontal_line_draw:
     txa
     adc SCREEN_PTR_LO
     sta MEMSET_ADDR_LO
@@ -96,7 +96,7 @@ draw_horizontal_line:
     jsr memset
     rts
 
-.abort:
+.draw_horizontal_line_ret:
     pla
     rts
 
