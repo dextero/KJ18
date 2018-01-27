@@ -61,7 +61,7 @@ sync_screen:
     rts
 
 
-; returns: A = 1 if offset updated, 0 otherwise
+; returns: updated offset
 update_hline_offset:
     ; update offset only when SPEED_COUNTER overflows
     lda SPEED_COUNTER
@@ -72,32 +72,46 @@ update_hline_offset:
     bcc .update_hline_offset_nope ; don't update offset
 
     ; offset = (offset + 1) % LINE_SKEW
-    inc SCREEN_HLINE_OFFSET
-    lda #LINE_SKEW
-    cmp SCREEN_HLINE_OFFSET
+    lda SCREEN_HLINE_OFFSET
+    adc #1
+    cmp #LINE_SKEW
 
-    bne .update_hline_offset_yup
+    bpl .update_hline_offset_zero
 
+    rts
+
+.update_hline_offset_zero:
     lda #0
-    sta SCREEN_HLINE_OFFSET
-
-.update_hline_offset_yup:
-    lda #1
     rts
 
 .update_hline_offset_nope:
-    lda #0
+    lda SCREEN_HLINE_OFFSET
     rts
 
 
 update_tracks:
     jsr update_hline_offset
-    cmp #0
-    bne .update_tracks_ret
+    cmp SCREEN_HLINE_OFFSET
 
+    beq .update_tracks_skip
+
+    ; offset changed
+    ; draw lines in black
+    pha
+
+    lda #$00
+    sta SCREEN_LINE_COLOR
     jsr draw_tracks
 
-.update_tracks_ret:
+    ; then apply new offset and draw new lines in white
+    pla
+    sta SCREEN_HLINE_OFFSET
+
+    lda #$ff
+    sta SCREEN_LINE_COLOR
+    jsr draw_tracks
+
+.update_tracks_skip:
     rts
 
 
@@ -159,7 +173,7 @@ draw_horizontal_line:
 
     pla
     tay
-    lda #$ff
+    lda SCREEN_LINE_COLOR
     jsr memset
     rts
 

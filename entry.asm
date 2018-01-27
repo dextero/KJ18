@@ -85,6 +85,8 @@ TIMER_ELAPSED_CENTISECONDS = $3a
 TIMER_ELAPSED_SECONDS = $3b
 TIMER_ELAPSED_MINUTES = $3c
 
+SCREEN_LINE_COLOR = $3d
+
 
 ; reuse memory - these are never used while SCREEN_LINE_* vars are
 SCREEN_HLINE_ROW = SCREEN_LINE_SKEW
@@ -138,7 +140,6 @@ rest:
     jsr calculate_speed
 
     jsr sync_screen
-    jsr clear_screen
     jsr update_tracks
     jsr draw_speed
     
