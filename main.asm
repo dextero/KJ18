@@ -87,8 +87,8 @@ screen_ptr_next_line:
     ; SCREEN_PTR is invalid
 
     lda SCREEN_PTR_LO
-    ; WHAT THE FUCK WHY DOES IT ONLY WORK WITH THAT -1
-    adc #SCREEN_LINE_SIZE_B-1
+    clc
+    adc #SCREEN_LINE_SIZE_B
     sta SCREEN_PTR_LO
     bcc screen_ptr_next_line_no_inc_hi
 
