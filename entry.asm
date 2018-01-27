@@ -1,10 +1,13 @@
     processor 6502
-    org $1000
+    org $0810
 
     include "core/memory.asm"
 
 ; =======================
 ; /consts/ ===============
+
+MUSIC_LOAD_ADDR = $1000
+MUSIC_PLAY_ADDR = $1003
 
 CONTROL_REG_1 = $d011
 CONTROL_REG_2 = $d016
@@ -76,9 +79,11 @@ QUOTIENT = NUMERATOR
 ; =======================
 ; /init/ ================
 
+
     ;speed
     lda #0
     sta CURRENT_SPEED
+    sta SPACE_STATE
 
     ;shifter
     lda #$04 
@@ -97,33 +102,41 @@ QUOTIENT = NUMERATOR
 
 main: 
 
-	jsr split_screen
-    
+    jsr creators_screen
+    jsr split_screen
 loop:
+    
 
     jsr clear_screen
     jsr sync_screen
     jsr draw_tracks
-	
+    
     jmp loop
     rts
 
 ; =======================
 ; /includes/ ============
-	include "core/split_screen.asm"
-	include "core/init_interupts.asm"
-	include "core/multicolor_mode.asm"
-	include "core/text_mode.asm"
+    include "core/split_screen.asm"
+    include "core/init_interupts.asm"
+    include "core/multicolor_mode.asm"
+    include "core/text_mode.asm"
+    include "core/title_screen.asm"
+    include "core/creators_screen.asm"
+    include "core/set_bank_one.asm"
+    include "core/set_bank_two.asm"
+    include "core/read_space.asm"
+    include "core/play_music.asm"
     include "core/draw.asm"
     include "core/math.asm"
 
 ; =======================
 ; /data/ ================
+            
+    org $1000-$7e
+    INCBIN "content/music.sid"
 
-speed_msg .byte "SPEED: ";
-
-    ;org $2000
-    ;incbin "content/gear_knob.spr"
+   ; org $2000
+   ; incbin "content/gear_knob.spr"
 
     org BITMAP
     ; set bitmap to 01010101 pattern
@@ -133,3 +146,13 @@ speed_msg .byte "SPEED: ";
     ; 10 - draw SCREEN (color = low nibble of SCREEN pixel)
     ; 11 - draw SCREEN (get color from COLOR_RAM[pixel])
     ds BITMAP_SIZE,$aa
+
+    org    $5FFE
+    incbin "content/creators_screen.prg"
+
+
+
+   
+speed_msg .byte "SPEED: ";
+title_msg	.byte "                                        "   
+            .byte "                HEY!                    "   

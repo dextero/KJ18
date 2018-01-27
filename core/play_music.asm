@@ -1,8 +1,3 @@
-	processor	6502
-	org	$0810
-
-
-
 play_music:
 	lda #$00
 	tax
@@ -35,8 +30,8 @@ play_music:
 	asl $d019
 	cli
 
-loop:    
-	jmp loop
+.loop:    
+	jmp .loop
 
 irq:      
 	jsr $1003
