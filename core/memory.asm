@@ -20,3 +20,7 @@ cpyspr:
 
     endm
 
+    mac clear_screen
+    jsr $e544
+    endm
+
