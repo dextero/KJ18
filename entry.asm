@@ -8,6 +8,7 @@
 
 CONTROL_REG_1 = $d011
 CONTROL_REG_2 = $d016
+RASTER_COUNTER = $d012
 
 PORT_A = $dc00
 PORT_B = $dc01
@@ -100,6 +101,10 @@ main:
     
 loop:
 
+    jsr clear_screen
+    jsr sync_screen
+    jsr draw_tracks
+	
     jmp loop
     rts
 

@@ -54,6 +54,12 @@ clear_screen subroutine
 
     rts
 
+sync_screen:
+    lda RASTER_COUNTER
+    cmp #$00
+    bne sync_screen
+    rts
+
 
 ; draw railway tracks starting from Y=0
 ; angle determined by LINE_SKEW (e.g. 3 means "offset by one pixel every 3 rows")
