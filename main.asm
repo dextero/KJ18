@@ -26,6 +26,10 @@ SCREEN_PTR_HI = $2C
 SCREEN_LINE_ITERATOR = $2D
 SCREEN_LINE_SKEW = $2E
 
+; reuse memory
+SCREEN_HLINE_STRIDE = SCREEN_LINE_ITERATOR
+SCREEN_HLINE_ROW = SCREEN_LINE_SKEW
+
 MEMSET_ADDR_LO = $2F
 MEMSET_ADDR_HI = $30
 
@@ -37,22 +41,32 @@ BITMAP = $2000
 BITMAP_END = $4000
 BITMAP_SIZE = BITMAP_END-BITMAP
 
+TRACK_UPPER_X = 18
+TRACK_UPPER_WIDTH = 4
+LINE_SKEW = 3
+
+DIVIDEND = $FD
+DIVISOR = $FC
+QUOTIENT = DIVIDEND
+
 main:
     jsr enter_multicolor_bitmap_mode
 
     jsr clear_screen
 loop:
-    ldy #18
-    ldx #-2
-    jsr draw_diagonal_line
-    ldy #22
-    ldx #2
+    ldy #TRACK_UPPER_X
+    ldx #-LINE_SKEW
     jsr draw_diagonal_line
 
-    ldx #5
-    ldy #7
-    lda #3
-    jsr draw_horizontal_line
+    ldy #TRACK_UPPER_X+TRACK_UPPER_WIDTH
+    ldx #LINE_SKEW
+    jsr draw_diagonal_line
+
+    lda #0
+    sta SCREEN_HLINE_ROW
+    lda #LINE_SKEW
+    sta SCREEN_HLINE_STRIDE
+    jsr draw_horizontal_lines
 
     jsr sync_screen
     ;inc BG_COLOR
@@ -100,6 +114,68 @@ draw_horizontal_line:
     pla
     rts
 
+
+; normal binary division
+; DIVIDEND = DIVIDEND / DIVISOR
+; http://6502org.wikidot.com/software-math-intdiv
+divide:
+    LDA #0
+    LDX #8
+    ASL DIVIDEND
+L1:
+    ROL
+    CMP DIVISOR
+    BCC L2
+    SBC DIVISOR
+L2:
+    ROL DIVIDEND
+    DEX
+    BNE L1
+
+    rts
+
+
+draw_horizontal_lines:
+    ; SCREEN_HLINE_STRIDE - stride
+    ; SCREEN_HLINE_ROW - first row to draw
+
+    ; while (SCREEN_HLINE_ROW < SCREEN_NUM_LINES) {
+.draw_horizontal_lines_next
+    ; X = TRACK_UPPER_X - SCREEN_HLINE_ROW / LINE_SKEW
+    lda SCREEN_HLINE_ROW
+    sta DIVIDEND
+    lda #LINE_SKEW
+    sta DIVISOR
+    jsr divide
+    lda #TRACK_UPPER_X
+
+    ; if carry clear, sbc subtracts extra 1
+    ; we actually want this extra -1 here
+    clc ; fucking sbc how does it work
+    sbc QUOTIENT
+    tax
+
+    ; A = TRACK_UPPER_WIDTH + 2 * (Y / LINE_SKEW)
+    ; dunno lol @ -1
+    lda #TRACK_UPPER_WIDTH-1
+    clc
+    adc QUOTIENT ; this should never overflow
+    adc QUOTIENT
+
+    ldy SCREEN_HLINE_ROW
+    jsr draw_horizontal_line
+
+    ;     SCREEN_HLINE_ROW += SCREEN_HLINE_STRIDE
+    lda SCREEN_HLINE_ROW
+    clc
+    adc SCREEN_HLINE_STRIDE
+    sta SCREEN_HLINE_ROW
+    ; }
+    cmp #SCREEN_NUM_LINES
+    bcc .draw_horizontal_lines_next
+
+.draw_horizontal_lines_ret:
+    rts
 
 
 screen_ptr_reset:
