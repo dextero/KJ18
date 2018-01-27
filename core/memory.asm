@@ -34,7 +34,7 @@ cpyspr:
     adc #>.imm
     sta .mem+1
     pla
-    
+
     endm
 
 
