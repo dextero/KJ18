@@ -75,8 +75,8 @@ div24:
 
 div24_dividend 	.ds 3
 div24_divisor 	.ds 3
-div24_remainder .db
-div24_pztemp 	.db
+div24_remainder .ds 1
+div24_pztemp 	.ds 1
 
 ; A*256 + X = mul8_a * mul8_b
 mul8:
@@ -95,5 +95,5 @@ mul8:
     ldx mul8_a
     rts
 
-mul8_a .db
-mul8_b .db
+mul8_a .ds 1
+mul8_b .ds 1
