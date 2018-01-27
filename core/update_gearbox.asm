@@ -1,7 +1,8 @@
-;//////////////////////////////////////////////////////////
-;// Updates gearbox state
-;// offsets gear lever sprite
-;//////////////////////////////////////////////////////////
+; Updates gearbox state
+; offsets gear lever sprite
+
+; =======================
+; /entry/   =============
 
 update_gearbox:
     ; check if the joystick state changed
