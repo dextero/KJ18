@@ -23,6 +23,8 @@ GEAR_LEVER_CENTER_Y = $D6
 
 GEAR_OFFSET = 16
 
+GEAR_CHANGE_LEEWAY = 5
+
 SCREEN = $400
 SCREEN_LINE_SIZE_B = 320/8
 SCREEN_STATUS_LINES = 4
@@ -105,6 +107,7 @@ main:
     
 loop:
 
+    jsr calculate_speed
     jsr clear_screen
     jsr update_tracks
 	
@@ -119,6 +122,7 @@ loop:
 	include "core/text_mode.asm"
     include "core/draw.asm"
     include "core/math.asm"
+    include "core/calculate_speed.asm"
 
 ; =======================
 ; /data/ ================
