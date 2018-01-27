@@ -19,3 +19,22 @@ cpyspr:
     rts
 
     endm
+
+
+    mac memset
+
+.addr SET {1}
+.value SET {2}
+.size SET {3}
+
+    lda .value
+    ldx .size
+
+memset_loop:
+    sta .addr,x
+    dex
+    bne memset_loop
+    rts
+
+    endm
+
