@@ -19,3 +19,37 @@ cpyspr:
     rts
 
     endm
+
+
+    mac add16_imm
+.mem SET {1}
+.imm SET {2}
+
+    pha
+    lda .mem
+    clc
+    adc #<.imm
+    sta .mem
+    lda .mem+1
+    adc #>.imm
+    sta .mem+1
+    pla
+
+    endm
+
+
+    mac sub16_imm
+.mem SET {1}
+.imm SET {2}
+
+    pha
+    lda .mem+1
+    sec
+    sbc #>.imm
+    sta .mem+1
+    lda .mem
+    sbc #<.imm
+    sta .mem
+    pla
+
+    endm

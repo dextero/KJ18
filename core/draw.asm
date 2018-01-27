@@ -1,71 +1,58 @@
-    processor 6502
-    org $1000
+; fill Y bytes starting from MEMSET_ADDR with A value
+; A - value
+; Y - size (0 is interpreted as 256!)
+memset subroutine
 
-    include "core/memory.asm"
+.memset_loop:
+    dey
+    sta (MEMSET_ADDR_LO),y
+    bne .memset_loop
 
-    mac clear_screen
-    jsr $e544
-    endm
+    rts
 
-BG_COLOR = $d021
 
-CONTROL_REG_1 = $d011
-CONTROL_REG_2 = $d016
-MEMORY_POINTERS = $d018
 
-RASTER_COUNTER = $d012
+; fill MEMSET_SIZE bytes starting from MEMSET_ADDR with A value
+; A = value
+memset16 subroutine
+    pha
+    lda MEMSET_SIZE_HI
+    cmp #0
+    beq memset16_final_block
 
-STACK = $100
+    ; memset(MEMSET_ADDR, A, 0x80);
+    pla
+    ldy #0
+    jsr memset
 
-SCREEN = $400
-SCREEN_LO = $00
-SCREEN_HI = $04
+    inc MEMSET_ADDR_HI
+    dec MEMSET_SIZE_HI
 
-SCREEN_END_LO = $e8
-SCREEN_END_HI = $07
+    jmp memset16
 
-SCREEN_PTR_LO = $2B
-SCREEN_PTR_HI = $2C
-SCREEN_LINE_ITERATOR = $2D
-SCREEN_LINE_SKEW = $2E
+memset16_final_block:
+    pla
+    ldy MEMSET_SIZE_LO
+    jsr memset
 
-; reuse memory
-SCREEN_HLINE_STRIDE = SCREEN_LINE_ITERATOR
-SCREEN_HLINE_ROW = SCREEN_LINE_SKEW
+    rts
 
-MEMSET_ADDR_LO = $2F
-MEMSET_ADDR_HI = $30
+; zero-initializes SCREEN
+clear_screen subroutine
+    lda #<SCREEN
+    sta MEMSET_ADDR_LO
+    lda #>SCREEN
+    sta MEMSET_ADDR_HI
 
-SCREEN_HLINE_OFFSET = $31
-
-SCREEN_LINE_SIZE_B = 320/8
-SCREEN_NUM_LINES = 200/8
-
-; BITMAP MUST be <=$3C00, and multiple of $400!
-BITMAP = $2000
-BITMAP_END = $4000
-BITMAP_SIZE = BITMAP_END-BITMAP
-
-TRACK_UPPER_X = 18
-TRACK_UPPER_WIDTH = 4
-LINE_SKEW = 3
-
-NUMERATOR = $FD
-DENUMERATOR = $FC
-QUOTIENT = NUMERATOR
-
-main:
-    jsr enter_multicolor_bitmap_mode
+    lda #<SCREEN_SIZE
+    sta MEMSET_SIZE_LO
+    lda #>SCREEN_SIZE
+    sta MEMSET_SIZE_HI
 
     lda #0
-    sta SCREEN_HLINE_OFFSET
+    jsr memset16
 
-loop:
-    clear_screen
-    jsr draw_tracks
-    jsr sync_screen
-    jmp loop
-
+    rts
 
 sync_screen:
     lda RASTER_COUNTER
@@ -74,6 +61,21 @@ sync_screen:
     rts
 
 
+; draw railway tracks starting from Y=0
+; angle determined by LINE_SKEW (e.g. 3 means "offset by one pixel every 3 rows")
+;
+;        TRACK_UPPER_X
+;                    |
+;                    v__________________ Y = 0
+; TRACK_UPPER_WIDTH  /<-->\            ^
+;                   /      \           | SCREEN_HLINE_OFFSET
+;                  /        \          v
+;                 /----------\ - - - - -
+;                /            \        ^
+;               /              \       |
+;              /                \      | SCREEN_HLINE_STRIDE
+;             /                  \     v
+;            /--------------------\- - -
 draw_tracks:
     ldy #TRACK_UPPER_X
     ldx #-LINE_SKEW
@@ -105,11 +107,10 @@ draw_tracks_no_reset_offset:
     rts
 
 
+; Y - row
+; X - col
+; A - width
 draw_horizontal_line:
-    ; Y - row
-    ; X - col
-    ; A - width
-
     pha
     jsr screen_ptr_reset
 
@@ -140,31 +141,9 @@ draw_horizontal_line:
     rts
 
 
-; normal binary division
-; NUMERATOR = NUMERATOR / DENUMERATOR
-; A = NUMERATOR % DENUMERATOR
-; http://6502org.wikidot.com/software-math-intdiv
-divide:
-    LDA #0
-    LDX #8
-    ASL NUMERATOR
-L1:
-    ROL
-    CMP DENUMERATOR
-    BCC L2
-    SBC DENUMERATOR
-L2:
-    ROL NUMERATOR
-    DEX
-    BNE L1
-
-    rts
-
-
+; SCREEN_HLINE_STRIDE - stride
+; SCREEN_HLINE_ROW - first row to draw
 draw_horizontal_lines:
-    ; SCREEN_HLINE_STRIDE - stride
-    ; SCREEN_HLINE_ROW - first row to draw
-
     ; while (SCREEN_HLINE_ROW < SCREEN_NUM_LINES) {
 .draw_horizontal_lines_next
     ; X = TRACK_UPPER_X - SCREEN_HLINE_ROW / LINE_SKEW
@@ -176,14 +155,12 @@ draw_horizontal_lines:
     lda #TRACK_UPPER_X
 
     ; if carry clear, sbc subtracts extra 1
-    ; we actually want this extra -1 here
-    clc ; fucking sbc how does it work
+    sec ; fucking sbc how does it work
     sbc QUOTIENT
     tax
 
     ; A = TRACK_UPPER_WIDTH + 2 * (Y / LINE_SKEW)
-    ; dunno lol @ -1
-    lda #TRACK_UPPER_WIDTH-1
+    lda #TRACK_UPPER_WIDTH
     clc
     adc QUOTIENT ; this should never overflow
     adc QUOTIENT
@@ -204,10 +181,11 @@ draw_horizontal_lines:
     rts
 
 
+; set SCREEN_PTR to point to the first SCREEN row
 screen_ptr_reset:
-    lda #SCREEN_LO
+    lda #<SCREEN
     sta SCREEN_PTR_LO
-    lda #SCREEN_HI
+    lda #>SCREEN
     sta SCREEN_PTR_HI
     rts
 
@@ -217,7 +195,7 @@ screen_ptr_valid:
     ; or to 0 if it is not
     ; NOTE: reports addresses below SCREEN as correct
     lda SCREEN_PTR_HI
-    cmp #SCREEN_END_HI
+    cmp #>SCREEN_END
 
     ; unsigned compare!
     beq screen_ptr_valid_maybe
@@ -225,7 +203,7 @@ screen_ptr_valid:
 
 screen_ptr_valid_maybe:
     lda SCREEN_PTR_LO
-    cmp #SCREEN_END_LO
+    cmp #<SCREEN_END
 
     bcc screen_ptr_valid_yup
 
@@ -238,13 +216,12 @@ screen_ptr_valid_yup:
     rts
 
 
+; advance SCREEN_PTR to next line
+;
+; set A to 1 if the line is still inside screen region
+; or to 0 if there are no more lines, in which case
+; SCREEN_PTR is invalid
 screen_ptr_next_line:
-    ; advance SCREEN_PTR to next line
-    ;
-    ; set A to 1 if the line is still inside screen region
-    ; or to 0 if there are no more lines, in which case
-    ; SCREEN_PTR is invalid
-
     lda SCREEN_PTR_LO
     clc
     adc #SCREEN_LINE_SIZE_B
@@ -258,40 +235,9 @@ screen_ptr_next_line_no_inc_hi:
     rts
 
 
-enter_multicolor_bitmap_mode:
-    ; RST8 ECM BMM DEN RSEL YSCROLL
-    ;   0   0   1   1    1    011
-    lda #%00111011 ; == $3b
-    sta CONTROL_REG_1
-
-    ; - - RES MCM CSEL XSCROLL
-    ; 0 0  0   1   1     000
-    lda #%00011000 ; == $18
-    sta CONTROL_REG_2
-
-    ; setup bitmap offset
-    lda #$10|BITMAP/$400
-    sta MEMORY_POINTERS
-
-    rts
-
-
-abs:
-    cmp #0
-    bpl abs_ret
-
-    eor #$ff ; poor man's ~x
-    clc
-    adc #1
-
-abs_ret:
-    rts
-
-
+; args: Y = X coordinate * 8 [unsigned]
+;       X = skew [signed]; 0 = vertical; -X /; +x \
 draw_diagonal_line:
-    ; args: Y = X coordinate * 8 [unsigned]
-    ;       X = skew [signed]; 0 = vertical; -X /; +x \
-
     jsr screen_ptr_reset
 
     stx SCREEN_LINE_SKEW
@@ -341,8 +287,8 @@ draw_diagonal_line_end:
     rts
 
 
+; args: Y = X coordinate * 8
 draw_vertical_line:
-    ; args: Y = X coordinate * 8
     jsr screen_ptr_reset
 
     ; i = 0
@@ -375,27 +321,3 @@ draw_vertical_line_skip_inc:
 
     ; }
     rts
-
-
-memset subroutine
-    ; fill .size bytes starting from MEMSET_ADDR with .value
-    ; A - value
-    ; Y - size
-
-.memset_loop:
-    sta (MEMSET_ADDR_LO),y
-    dey
-    bne .memset_loop
-
-    rts
-
-
-
-    org BITMAP
-    ; set bitmap to 01010101 pattern
-    ; this way it is overridden with SCREEN
-    ; 00 - draw BITMAP
-    ; 01 - draw SCREEN (color = high nibble of SCREEN pixel)
-    ; 10 - draw SCREEN (color = low nibble of SCREEN pixel)
-    ; 11 - draw SCREEN (get color from COLOR_RAM[pixel])
-    ds BITMAP_SIZE,$aa
