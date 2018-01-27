@@ -258,4 +258,10 @@ draw_vertical_line_skip_inc:
     rts
 
     org BITMAP
-    ds BITMAP_SIZE,0
+    ; set bitmap to 01010101 pattern
+    ; this way it is overridden with SCREEN
+    ; 00 - draw BITMAP
+    ; 01 - draw SCREEN (color = high nibble of SCREEN pixel)
+    ; 10 - draw SCREEN (color = low nibble of SCREEN pixel)
+    ; 11 - draw SCREEN (get color from COLOR_RAM[pixel])
+    ds BITMAP_SIZE,$aa
