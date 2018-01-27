@@ -62,7 +62,19 @@ main:
 
 loop:
     clear_screen
+    jsr draw_tracks
+    jsr sync_screen
+    jmp loop
 
+
+sync_screen:
+    lda RASTER_COUNTER
+    cmp #$00
+    bne sync_screen
+    rts
+
+
+draw_tracks:
     ldy #TRACK_UPPER_X
     ldx #-LINE_SKEW
     jsr draw_diagonal_line
@@ -84,20 +96,12 @@ loop:
     inc SCREEN_HLINE_OFFSET
     lda #LINE_SKEW*2 ; TODO: 2 because (*)
     cmp SCREEN_HLINE_OFFSET
-    bne loop_no_reset
+    bne draw_tracks_no_reset_offset
 
     lda #0
     sta SCREEN_HLINE_OFFSET
 
-loop_no_reset:
-    jsr sync_screen
-    jmp loop
-
-
-sync_screen:
-    lda RASTER_COUNTER
-    cmp #$00
-    bne sync_screen
+draw_tracks_no_reset_offset:
     rts
 
 
