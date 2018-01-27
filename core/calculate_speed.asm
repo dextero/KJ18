@@ -26,9 +26,11 @@ decelerate:
 ; Y - max bound
 accelerate_if_speed_between:
     cpx CURRENT_SPEED
-    bcc decelerate
+    beq .equal
+    bcs decelerate ; >=
+.equal:
     cpy CURRENT_SPEED
-    bcs decelerate
+    bcc decelerate
 
     lda #$ff
     cmp CURRENT_SPEED
@@ -44,42 +46,42 @@ accelerate_if_speed_between:
 calculate_speed:
 	lda CURRENT_SHIFTER_POS
 
-    cmp #$01
+    cmp #$00
     bne .gear2
-    ldx #0-GEAR_CHANGE_LEEWAY
+    ldx #0
     ldy #44+GEAR_CHANGE_LEEWAY
     jmp accelerate_if_speed_between
 
 .gear2:
-    cmp #$07
+    cmp #$06
     bne .gear3
     ldx #44-GEAR_CHANGE_LEEWAY
     ldy #88+GEAR_CHANGE_LEEWAY
     jmp accelerate_if_speed_between
 
 .gear3:
-    cmp #$02
+    cmp #$01
     bne .gear4
     ldx #88-GEAR_CHANGE_LEEWAY
     ldy #132+GEAR_CHANGE_LEEWAY
     jmp accelerate_if_speed_between
 
 .gear4:
-    cmp #$08
+    cmp #$07
     bne .gear5
     ldx #132-GEAR_CHANGE_LEEWAY
     ldy #176+GEAR_CHANGE_LEEWAY
     jmp accelerate_if_speed_between
 
 .gear5:
-    cmp #$03
+    cmp #$02
     bne .gear6
     ldx #176-GEAR_CHANGE_LEEWAY
     ldy #220+GEAR_CHANGE_LEEWAY
     jmp accelerate_if_speed_between
 
 .gear6:
-    cmp #$09
+    cmp #$08
     bne .neutral
     ldx #220-GEAR_CHANGE_LEEWAY
     ldy #255
