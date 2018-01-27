@@ -3,6 +3,9 @@
 
     include "core/memory.asm"
 
+    mac clear_screen
+    jsr $e544
+    endm
 
 BG_COLOR = $d021
 
@@ -52,8 +55,9 @@ QUOTIENT = DIVIDEND
 main:
     jsr enter_multicolor_bitmap_mode
 
-    jsr clear_screen
 loop:
+    clear_screen
+
     ldy #TRACK_UPPER_X
     ldx #-LINE_SKEW
     jsr draw_diagonal_line
@@ -229,37 +233,6 @@ screen_ptr_next_line:
 
 screen_ptr_next_line_no_inc_hi:
     jsr screen_ptr_valid
-    rts
-
-
-clear_screen:
-    ; args: X = zero-page address to number of bytes to clear
-
-    jsr screen_ptr_reset
-
-    lda #0
-
-    ; while (screen_ptr_valid(screen_ptr)) {
-clear_screen_row_loop:
-    jsr screen_ptr_valid
-    cmp #1
-    bne clear_screen_end
-
-    lda #0
-    ldy #SCREEN_LINE_SIZE_B
-    ;     while (y-- > 0) {
-clear_screen_col_loop:
-    ;         *screen_ptr[y] = A;
-    dey
-    sta (SCREEN_PTR_LO),Y
-    ;    }
-    bne clear_screen_col_loop
-
-    ;    screen_ptr += line_size;
-    jsr screen_ptr_next_line
-    jmp clear_screen_row_loop
-    ; }
-clear_screen_end:
     rts
 
 
