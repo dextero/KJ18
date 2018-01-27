@@ -61,6 +61,47 @@ sync_screen:
     rts
 
 
+; returns: A = 1 if offset updated, 0 otherwise
+update_hline_offset:
+    ; update offset only when SPEED_COUNTER overflows
+    lda SPEED_COUNTER
+    clc
+    adc CURRENT_SPEED
+    sta SPEED_COUNTER
+
+    bcc .update_hline_offset_nope ; don't update offset
+
+    ; offset = (offset + 1) % LINE_SKEW
+    inc SCREEN_HLINE_OFFSET
+    lda #LINE_SKEW
+    cmp SCREEN_HLINE_OFFSET
+
+    bne .update_hline_offset_yup
+
+    lda #0
+    sta SCREEN_HLINE_OFFSET
+
+.update_hline_offset_yup:
+    lda #1
+    rts
+
+.update_hline_offset_nope:
+    lda #0
+    rts
+
+
+update_tracks:
+    jsr update_hline_offset
+    cmp #0
+    bne .update_tracks_ret
+
+    jsr draw_tracks
+
+.update_tracks_ret:
+    rts
+
+
+
 ; draw railway tracks starting from Y=0
 ; angle determined by LINE_SKEW (e.g. 3 means "offset by one pixel every 3 rows")
 ;
@@ -85,25 +126,10 @@ draw_tracks:
     ldx #LINE_SKEW
     jsr draw_diagonal_line
 
-    lda SCREEN_HLINE_OFFSET
-    ; (*) slow down a bit (update each 2 frames)
-    lsr
-
     sta SCREEN_HLINE_ROW
     lda #LINE_SKEW+1
     sta SCREEN_HLINE_STRIDE
     jsr draw_horizontal_lines
-
-    ; offset = (offset + 1) % LINE_SKEW
-    inc SCREEN_HLINE_OFFSET
-    lda #LINE_SKEW*2 ; TODO: 2 because (*)
-    cmp SCREEN_HLINE_OFFSET
-    bne draw_tracks_no_reset_offset
-
-    lda #0
-    sta SCREEN_HLINE_OFFSET
-
-draw_tracks_no_reset_offset:
     rts
 
 

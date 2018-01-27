@@ -44,7 +44,6 @@ LINE_SKEW = 3
 ; =======================
 ; /variables/ ===========
 
-CURRENT_SPEED = 2051;
 CURRENT_SHIFTER_POS = 2050
 
 JOYSTICK_STATE = 2048
@@ -65,6 +64,9 @@ MEMSET_SIZE_HI = $32
 
 SCREEN_HLINE_OFFSET = $33
 SCREEN_HLINE_STRIDE = $34
+
+CURRENT_SPEED = $35 ; unsigned, 0 - full stop, 255 - max
+SPEED_COUNTER = $36 ; slow speeds cause update every N-th frame
 
 ; reuse memory - these are never used while SCREEN_LINE_* vars are
 SCREEN_HLINE_ROW = SCREEN_LINE_SKEW
@@ -98,12 +100,13 @@ QUOTIENT = NUMERATOR
 main: 
 
 	jsr split_screen
+    jsr clear_screen
+    jsr draw_tracks
     
 loop:
 
     jsr clear_screen
-    jsr sync_screen
-    jsr draw_tracks
+    jsr update_tracks
 	
     jmp loop
     rts
