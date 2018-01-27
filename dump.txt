@@ -8,7 +8,7 @@ JOYSTICK_ADDR  = $DC00
 CONTROL_REG_1 = $d011
 CONTROL_REG_2 = $d016
 
-GEAR_SPRITE_DATA = $88
+GEAR_SPRITE_DATA = $80 ; org 1200
 GEAR_LEVER_CENTER_X = $25
 GEAR_LEVER_CENTER_Y = $D6
 
@@ -33,7 +33,7 @@ init:
 
 init_gear_sprite:
 	; load sprite
-	lda #GEAR_SPRITE_DATA
+	lda #GEAR_SPRITE_DATA ; 
 	sta $07f8
 
 	; enable gear sprite sprite
@@ -53,8 +53,7 @@ init_gear_state
 	lda #$04 ; center gear
 	sta CURRENT_SHIFTER_POS 
 
-init_background:
-	jsr load_bcg
+	; jsr load_background 
 
 main:
 	; main program
@@ -67,51 +66,16 @@ main:
 	beq goto_move       ; if we are not changing gears
 	jsr update_gearbox  ; change gears
 	jmp handling		
-		
+
 goto_move:
 	jsr move ; update train position
 
 handling:
-
 	jmp main
 
 ; //// move train
 move:
 	rts
-
-; //// load background
-load_bcg:
-
-	; load color
-	lda $4710
-	sta $d020
-	sta $d021
-
-	; copy data
-	ldx #$00
-loaddccimage:
-	lda $3f40,x
-	sta $0400,x
-	lda $4040,x
-	sta $0500,x
-	lda $4140,x
-	sta $0600,x
-	lda $4240,x
-	sta $0700,x
-
-	lda $4328,x
-	sta $d800,x
-	lda $4428,x
-	sta $d900,x
-	lda $4528,x
-	sta $da00,x
-	lda $4628,x
-	sta $db00,x
-	inx
-	bne loaddccimage
-
-	rts
-
 
 ; //// check space key
 read_space:
@@ -144,6 +108,36 @@ PORT_B = $dc01
 
 ret_read_space:
 	cli
+	rts
+
+; //// check space key
+load_background:
+	; store background color
+	lda $4710 
+	sta $d020
+	sta $d021
+	; copy image data
+	ldx #$00
+
+loaddccimage:
+	lda $3f40,x
+	sta $0400,x
+	lda $4040,x
+	sta $0500,x
+	lda $4140,x
+	sta $0600,x
+	lda $4240,x
+	sta $0700,x
+	lda $4328,x
+	sta $d800,x
+	lda $4428,x
+	sta $d900,x
+	lda $4528,x
+	sta $da00,x
+	lda $4628,x
+	sta $db00,x
+	inx
+	bne loaddccimage
 	rts
 
 ; //// update gearbox counter
@@ -258,8 +252,7 @@ enter_standard_bitmap_mode:
 ; //// data ////
 ; //////////////
 
-	;org $2200
-	;incbin "gear_knob.spr"
+	org $2000
+	incbin "gear_knob.spr"
 
-	org $1ffe
-	incbin "background.prg"
+	
