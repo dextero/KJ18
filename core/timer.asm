@@ -22,7 +22,7 @@ timer_get_elapsed:
     txa
     sec
     sbc JIFFIES_MI
-    bcc .timer_get_elapsed_no_mi_carry:
+    bcc .timer_get_elapsed_no_mi_carry
 
     dec TIMER_ELAPSED_MINUTES
 
@@ -30,9 +30,9 @@ timer_get_elapsed:
     sta TIMER_ELAPSED_SECONDS ; temporarily jiffies
 
     tya
-    src
+    sec
     sbc JIFFIES_LO
-    bcc .timer_get_elapsed_no_lo_carry:
+    bcc .timer_get_elapsed_no_lo_carry
 
     dec TIMER_ELAPSED_SECONDS
 
@@ -73,7 +73,7 @@ timer_get_elapsed:
     sta mul8_a
     lda #100
     sta mul8_b
-    mul8
+    jsr mul8
 
     stx div24_dividend+0
     sta div24_dividend+1
@@ -85,7 +85,7 @@ timer_get_elapsed:
     lda #60
     sta div24_divisor+0
 
-    div24
+    jsr div24
     lda div24_dividend+0
     sta TIMER_ELAPSED_CENTISECONDS
 
