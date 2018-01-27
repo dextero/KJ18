@@ -1,6 +1,8 @@
     processor 6502
     org $1000
 
+    include "core/memory.asm"
+
 BG_COLOR = $d021
 
 CONTROL_REG_1 = $d011
@@ -22,6 +24,9 @@ SCREEN_PTR_LO = $2B
 SCREEN_PTR_HI = $2C
 SCREEN_LINE_ITERATOR = $2D
 SCREEN_LINE_SKEW = $2E
+
+MEMSET_SCRATCH_LO = $2F
+MEMSET_SCRATCH_HI = $30
 
 SCREEN_LINE_SIZE_B = 320/8
 SCREEN_NUM_LINES = 200/8
@@ -256,6 +261,29 @@ draw_vertical_line_skip_inc:
 
     ; }
     rts
+
+
+draw_horizontal_line subroutine
+    ; args: Y = row
+    ;       X = column * 8 [unsigned]
+
+    jsr screen_ptr_reset
+
+    iny
+.skip_row:
+    dey
+    beq .draw
+    jsr screen_ptr_next_line
+    cmp #1
+    bne .ret ; invalid row
+    jsr screen_ptr_next_line
+    
+.draw:
+    memset 
+
+.ret:
+    rts
+
 
     org BITMAP
     ; set bitmap to 01010101 pattern
