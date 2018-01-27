@@ -135,8 +135,8 @@ draw_tracks:
     ldy #TRACK_UPPER_X
     ldx #-LINE_SKEW
     jsr draw_diagonal_line
-
-    ldy #TRACK_UPPER_X+TRACK_UPPER_WIDTH
+    
+    ldy #TRACK_UPPER_X+TRACK_UPPER_WIDTH+1
     ldx #LINE_SKEW
     jsr draw_diagonal_line
 
