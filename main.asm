@@ -256,3 +256,6 @@ draw_vertical_line_skip_inc:
 
     ; }
     rts
+
+    org BITMAP
+    ds BITMAP_SIZE,0
