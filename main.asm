@@ -36,6 +36,8 @@ SCREEN_HLINE_ROW = SCREEN_LINE_SKEW
 MEMSET_ADDR_LO = $2F
 MEMSET_ADDR_HI = $30
 
+SCREEN_HLINE_OFFSET = $31
+
 SCREEN_LINE_SIZE_B = 320/8
 SCREEN_NUM_LINES = 200/8
 
@@ -55,6 +57,9 @@ QUOTIENT = NUMERATOR
 main:
     jsr enter_multicolor_bitmap_mode
 
+    lda #0
+    sta SCREEN_HLINE_OFFSET
+
 loop:
     clear_screen
 
@@ -66,14 +71,26 @@ loop:
     ldx #LINE_SKEW
     jsr draw_diagonal_line
 
-    lda #0
+    lda SCREEN_HLINE_OFFSET
+    ; (*) slow down a bit (update each 2 frames)
+    lsr
+
     sta SCREEN_HLINE_ROW
-    lda #LINE_SKEW
+    lda #LINE_SKEW+1
     sta SCREEN_HLINE_STRIDE
     jsr draw_horizontal_lines
 
+    ; offset = (offset + 1) % LINE_SKEW
+    inc SCREEN_HLINE_OFFSET
+    lda #LINE_SKEW*2 ; TODO: 2 because (*)
+    cmp SCREEN_HLINE_OFFSET
+    bne loop_no_reset
+
+    lda #0
+    sta SCREEN_HLINE_OFFSET
+
+loop_no_reset:
     jsr sync_screen
-    ;inc BG_COLOR
     jmp loop
 
 
