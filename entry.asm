@@ -20,6 +20,20 @@ GEAR_LEVER_CENTER_Y = $D6
 
 GEAR_OFFSET = 16
 
+SCREEN = $400
+SCREEN_LO = $00
+SCREEN_HI = $04
+SCREEN_END_LO = $e8
+SCREEN_END_HI = $07
+
+SCREEN_LINE_SIZE_B = 320/8
+SCREEN_NUM_LINES = 200/8
+
+; see draw_tracks
+TRACK_UPPER_X = 18
+TRACK_UPPER_WIDTH = 4
+LINE_SKEW = 3
+
 ; =======================
 ; /variables/ ===========
 
@@ -31,6 +45,24 @@ SPACE_STATE = 2049
 
 GEAR_LEVER_X = $d000
 GEAR_LEVER_Y = $d001
+
+SCREEN_PTR_LO = $2B
+SCREEN_PTR_HI = $2C
+SCREEN_LINE_ITERATOR = $2D
+SCREEN_LINE_SKEW = $2E
+
+MEMSET_ADDR_LO = $2F
+MEMSET_ADDR_HI = $30
+
+SCREEN_HLINE_OFFSET = $31
+
+; reuse memory - these are never used while SCREEN_LINE_* vars are
+SCREEN_HLINE_STRIDE = SCREEN_LINE_ITERATOR
+SCREEN_HLINE_ROW = SCREEN_LINE_SKEW
+
+NUMERATOR = $FD
+DENUMERATOR = $FC
+QUOTIENT = NUMERATOR
 
 ; =======================
 ; /init/ ================
@@ -69,6 +101,8 @@ loop:
 	include "core/init_interupts.asm"
 	include "core/multicolor_mode.asm"
 	include "core/text_mode.asm"
+    include "core/draw.asm"
+    include "core/math.asm"
 
 ; =======================
 ; /data/ ================
