@@ -173,5 +173,11 @@ rest:
 
    
 speed_msg .byte "SPEED: ";
+speed_msg_size = . - speed_msg
+gear_msg .byte " G: ";
+gear_msg_size = . - gear_msg
+spaces .byte "     "
+spaces_size = . - spaces
+
 title_msg	.byte "                                        "   
             .byte "                HEY!                    "   
