@@ -39,11 +39,7 @@ loaddccimage:
     inx
     bne loaddccimage
 
-wait:
-    jsr read_space
-    lda SPACE_STATE
-    cmp #00
-    beq wait
+    jsr wait_for_space
 
     jsr set_bank_one
     jsr text_mode

@@ -9,6 +9,9 @@
 MUSIC_LOAD_ADDR = $1000
 MUSIC_PLAY_ADDR = $1003
 
+TITLE_BCG = $13
+TITLE_BORDER = $04
+
 JIFFIES_LO = $A2
 JIFFIES_MI = $A1
 JIFFIES_HI = $A0
@@ -120,20 +123,20 @@ QUOTIENT = NUMERATOR
 ; /methods/   ===========
 
 main: 
-    
     jsr creators_screen
+    jsr title_screen
+
+
     jsr split_screen
     jsr play_music
 
     jsr clear_screen
     jsr draw_tracks
 loop:
-
-	
-	;handle movement
+    ;handle movement
     jsr read_space
-	lda SPACE_STATE
-	beq rest 
+    lda SPACE_STATE
+    beq rest 
     jsr update_gearbox
 rest:
 
@@ -144,6 +147,9 @@ rest:
     jsr draw_speed
     
     jmp loop
+
+    jsr highscore_screen
+
     rts
 
 ; =======================
@@ -164,6 +170,8 @@ rest:
     include "core/update_gearbox.asm"
     include "core/draw_speed.asm"
     include "core/timer.asm"
+    include "core/wait_for_space.asm"
+    include "core/highscore_screen.asm"
 
 ; =======================
 ; /data/ ================
@@ -194,5 +202,8 @@ gear_msg_size = . - gear_msg
 spaces .byte "     "
 spaces_size = . - spaces
 
-title_msg	.byte "                                        "   
-            .byte "                HEY!                    "   
+title_msg	.byte "maly penis farme mial, ia, ia ou"
+title_msg_size = . - title_msg
+
+highscore_msg	.byte "mamo, gdzie ja jestem"
+highscore_msg_size = . - highscore_msg
