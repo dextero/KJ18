@@ -48,9 +48,9 @@ TRACK_UPPER_X = 18
 TRACK_UPPER_WIDTH = 4
 LINE_SKEW = 3
 
-DIVIDEND = $FD
-DIVISOR = $FC
-QUOTIENT = DIVIDEND
+NUMERATOR = $FD
+DENUMERATOR = $FC
+QUOTIENT = NUMERATOR
 
 main:
     jsr enter_multicolor_bitmap_mode
@@ -120,19 +120,20 @@ draw_horizontal_line:
 
 
 ; normal binary division
-; DIVIDEND = DIVIDEND / DIVISOR
+; NUMERATOR = NUMERATOR / DENUMERATOR
+; A = NUMERATOR % DENUMERATOR
 ; http://6502org.wikidot.com/software-math-intdiv
 divide:
     LDA #0
     LDX #8
-    ASL DIVIDEND
+    ASL NUMERATOR
 L1:
     ROL
-    CMP DIVISOR
+    CMP DENUMERATOR
     BCC L2
-    SBC DIVISOR
+    SBC DENUMERATOR
 L2:
-    ROL DIVIDEND
+    ROL NUMERATOR
     DEX
     BNE L1
 
@@ -147,9 +148,9 @@ draw_horizontal_lines:
 .draw_horizontal_lines_next
     ; X = TRACK_UPPER_X - SCREEN_HLINE_ROW / LINE_SKEW
     lda SCREEN_HLINE_ROW
-    sta DIVIDEND
+    sta NUMERATOR
     lda #LINE_SKEW
-    sta DIVISOR
+    sta DENUMERATOR
     jsr divide
     lda #TRACK_UPPER_X
 
