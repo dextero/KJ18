@@ -3,32 +3,6 @@
 
     include "core/memory.asm"
 
-; //// consts
-
-JOYSTICK_ADDR  = $DC00
-
-CONTROL_REG_1 = $d011
-CONTROL_REG_2 = $d016
-
-GEAR_SPRITE_DATA = $80
-GEAR_LEVER_CENTER_X = $25
-GEAR_LEVER_CENTER_Y = $D6
-
-GEAR_OFFSET = 16
-
-; //// variables
-
-JOYSTICK_STATE = 2048
-SPACE_STATE = 2049
-CURRENT_SHIFTER_POS = 2050
-
-GEAR_LEVER_X = $d000
-GEAR_LEVER_Y = $d001
-
-; /////////////////
-; //// program ////
-; /////////////////
-
 init:
     jsr enter_standard_bitmap_mode
 
@@ -88,4 +62,4 @@ enter_standard_bitmap_mode:
 ; //////////////
 
     org $2000
-    incbin "gear_knob.spr"
+    incbin "content/gear_knob.spr"

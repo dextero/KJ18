@@ -1,12 +1,9 @@
-;//////////////////////////////////////////////////////////
-;// reads space state and saves it in SPACE_STATE variable
-;//////////////////////////////////////////////////////////
+; reads space state and saves it in SPACE_STATE variable
+
+;=========================
+; /entry/ ================
 
 read_space:
-
-PORT_A = $dc00
-PORT_B = $dc01
-
     sei
 
     lda #%11111111  ; CIA#1 port A = outputs 
