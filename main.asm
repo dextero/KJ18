@@ -279,7 +279,7 @@ draw_horizontal_line subroutine
     jsr screen_ptr_next_line
     
 .draw:
-    memset 
+    ;memset 
 
 .ret:
     rts
