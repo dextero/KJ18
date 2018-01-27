@@ -1,10 +1,13 @@
     processor 6502
-    org $1000
+    org $0810
 
     include "core/memory.asm"
 
 ; =======================
 ; /consts/ ===============
+
+MUSIC_LOAD_ADDR = $1000
+MUSIC_PLAY_ADDR = $1003
 
 CONTROL_REG_1 = $d011
 CONTROL_REG_2 = $d016
@@ -80,9 +83,11 @@ QUOTIENT = NUMERATOR
 ; =======================
 ; /init/ ================
 
+
     ;speed
     lda #0
     sta CURRENT_SPEED
+    sta SPACE_STATE
 
     ;shifter
     lda #$04 
@@ -100,39 +105,59 @@ QUOTIENT = NUMERATOR
 ; /methods/   ===========
 
 main: 
+    
+    jsr creators_screen
+    jsr split_screen
+    jsr play_music
 
-	jsr split_screen
     jsr clear_screen
     jsr draw_tracks
-    
 loop:
 
+	
+	;handle movement
+    jsr read_space
+	lda SPACE_STATE
+	beq rest 
     jsr update_gearbox
+rest:
+
     jsr calculate_speed
+
+    jsr sync_screen
     jsr clear_screen
     jsr update_tracks
-	
+    jsr draw_speed
+    
     jmp loop
     rts
 
 ; =======================
 ; /includes/ ============
-	include "core/split_screen.asm"
-	include "core/init_interupts.asm"
-	include "core/multicolor_mode.asm"
-	include "core/text_mode.asm"
+    include "core/split_screen.asm"
+    include "core/init_interupts.asm"
+    include "core/multicolor_mode.asm"
+    include "core/text_mode.asm"
+    include "core/title_screen.asm"
+    include "core/creators_screen.asm"
+    include "core/set_bank_one.asm"
+    include "core/set_bank_two.asm"
+    include "core/read_space.asm"
+    include "core/play_music.asm"
     include "core/draw.asm"
     include "core/math.asm"
     include "core/calculate_speed.asm"
     include "core/update_gearbox.asm"
+    include "core/draw_speed.asm"
 
 ; =======================
 ; /data/ ================
+            
+    org $1000-$7e
+    INCBIN "content/music.sid"
 
-speed_msg .byte "SPEED: ";
-
-    ;org $2000
-    ;incbin "content/gear_knob.spr"
+   ; org $2000
+   ; incbin "content/sprite.spr"
 
     org BITMAP
     ; set bitmap to 01010101 pattern
@@ -142,3 +167,11 @@ speed_msg .byte "SPEED: ";
     ; 10 - draw SCREEN (color = low nibble of SCREEN pixel)
     ; 11 - draw SCREEN (get color from COLOR_RAM[pixel])
     ds BITMAP_SIZE,$aa
+
+    org    $5FFE
+    incbin "content/creators_screen.prg"
+
+   
+speed_msg .byte "SPEED: ";
+title_msg	.byte "                                        "   
+            .byte "                HEY!                    "   

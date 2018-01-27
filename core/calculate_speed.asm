@@ -1,33 +1,45 @@
 ; =======================
 ; /entry/   =============
 
+noop:
+    rts
+
+accelerate:
+    lda CURRENT_SPEED
+    cmp #$ff
+    beq noop
+
+    inc CURRENT_SPEED
+    rts
+
+
+decelerate:
+    lda CURRENT_SPEED
+    cmp #$00
+    beq noop
+
+    dec CURRENT_SPEED
+    rts
+
 
 ; X - min bound
 ; Y - max bound
 accelerate_if_speed_between:
     cpx CURRENT_SPEED
-    bcc .decelerate
+    bcc decelerate
     cpy CURRENT_SPEED
-    bcs .decelerate
+    bcs decelerate
 
     lda #$ff
     cmp CURRENT_SPEED
-    bne .accelerate
+    bne accelerate
 
     ; already max speed
     rts
 
-.accelerate:
-    inc CURRENT_SPEED
-    rts
 
-.decelerate:
-    dec CURRENT_SPEED
-    rts
-
-
-; if speed == 255, do nothing
-; otherwise, if speed in [gear*44-GEAR_CHANGE_LEEWAY, (gear+1)*44+GEAR_CHANGE_LEEWAY] range
+; if speed in [gear*44-GEAR_CHANGE_LEEWAY, (gear+1)*44+GEAR_CHANGE_LEEWAY] range, accelerate
+; BUT if speed == 255 and would accelerate OR speed == 0 and would decelerate, do nothing
 ; otherwise, decelerate
 calculate_speed:
 	lda CURRENT_SHIFTER_POS
@@ -74,5 +86,4 @@ calculate_speed:
     jmp accelerate_if_speed_between
 
 .neutral:
-    dec CURRENT_SPEED
-    rts
+    jmp decelerate
