@@ -9,6 +9,10 @@
 MUSIC_LOAD_ADDR = $1000
 MUSIC_PLAY_ADDR = $1003
 
+JIFFIES_LO = $A2
+JIFFIES_MI = $A1
+JIFFIES_HI = $A0
+
 CONTROL_REG_1 = $d011
 CONTROL_REG_2 = $d016
 RASTER_COUNTER = $d012
@@ -26,9 +30,11 @@ GEAR_LEVER_CENTER_Y = $D6
 
 GEAR_OFFSET = 16
 
+GEAR_CHANGE_LEEWAY = 5
+
 SCREEN = $400
 SCREEN_LINE_SIZE_B = 320/8
-SCREEN_STATUS_LINES = 5
+SCREEN_STATUS_LINES = 4
 SCREEN_NUM_LINES = 200/8-SCREEN_STATUS_LINES
 SCREEN_SIZE = SCREEN_NUM_LINES * SCREEN_LINE_SIZE_B
 SCREEN_END = SCREEN + SCREEN_SIZE
@@ -47,7 +53,6 @@ LINE_SKEW = 3
 ; =======================
 ; /variables/ ===========
 
-CURRENT_SPEED = 2051;
 CURRENT_SHIFTER_POS = 2050
 
 JOYSTICK_STATE = 2048
@@ -67,9 +72,21 @@ MEMSET_SIZE_LO = $31
 MEMSET_SIZE_HI = $32
 
 SCREEN_HLINE_OFFSET = $33
+SCREEN_HLINE_STRIDE = $34
+
+CURRENT_SPEED = $35 ; unsigned, 0 - full stop, 255 - max
+SPEED_COUNTER = $36 ; slow speeds cause update every N-th frame
+
+TIMER_START_JIFFIES_LO = $37
+TIMER_START_JIFFIES_MI = $38
+TIMER_START_JIFFIES_HI = $39
+
+TIMER_ELAPSED_CENTISECONDS = $3a
+TIMER_ELAPSED_SECONDS = $3b
+TIMER_ELAPSED_MINUTES = $3c
+
 
 ; reuse memory - these are never used while SCREEN_LINE_* vars are
-SCREEN_HLINE_STRIDE = SCREEN_LINE_ITERATOR
 SCREEN_HLINE_ROW = SCREEN_LINE_SKEW
 
 NUMERATOR = $FD
@@ -105,8 +122,12 @@ main:
     jsr creators_screen
     jsr split_screen
     jsr play_music
+
+    jsr clear_screen
+    jsr draw_tracks
 loop:
 
+	
 	;handle movement
     jsr read_space
 	lda SPACE_STATE
@@ -114,9 +135,11 @@ loop:
     jsr update_gearbox
 rest:
 
-    jsr clear_screen
+    jsr calculate_speed
+
     jsr sync_screen
-    jsr draw_tracks
+    jsr clear_screen
+    jsr update_tracks
     jsr draw_speed
     
     jmp loop
@@ -136,8 +159,10 @@ rest:
     include "core/play_music.asm"
     include "core/draw.asm"
     include "core/math.asm"
+    include "core/calculate_speed.asm"
     include "core/update_gearbox.asm"
     include "core/draw_speed.asm"
+    include "core/timer.asm"
 
 ; =======================
 ; /data/ ================
@@ -162,5 +187,11 @@ rest:
 
    
 speed_msg .byte "SPEED: ";
+speed_msg_size = . - speed_msg
+gear_msg .byte " G: ";
+gear_msg_size = . - gear_msg
+spaces .byte "     "
+spaces_size = . - spaces
+
 title_msg	.byte "                                        "   
             .byte "                HEY!                    "   

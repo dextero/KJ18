@@ -53,3 +53,17 @@ cpyspr:
     pla
 
     endm
+
+    mac write
+.text SET {1}
+.size SET {2}
+
+    ldx #$00
+.write:
+    lda .text,x
+    jsr $ffd2
+    inx
+    cpx #.size
+    bne .write
+
+    endm
