@@ -5,6 +5,9 @@ BG_COLOR = $d021
 
 CONTROL_REG_1 = $d011
 CONTROL_REG_2 = $d016
+MEMORY_POINTERS = $d018
+
+RASTER_COUNTER = $d012
 
 STACK = $100
 
@@ -23,8 +26,10 @@ SCREEN_LINE_SKEW = $2E
 SCREEN_LINE_SIZE_B = 320/8
 SCREEN_NUM_LINES = 200/8
 
-RASTER_COUNTER = $d012
-
+; BITMAP MUST be <=$3C00, and multiple of $400!
+BITMAP = $2000
+BITMAP_END = $4000
+BITMAP_SIZE = BITMAP_END-BITMAP
 
 main:
     jsr enter_multicolor_bitmap_mode
@@ -135,15 +140,19 @@ clear_screen_end:
 
 
 enter_multicolor_bitmap_mode:
-    ; https://www.c64-wiki.com/wiki/Multicolor_Bitmap_Mode
-    lda CONTROL_REG_1
-    and #%10111111 ; clear bit 6
-    ora #%00100000 ; set bit 5
+    ; RST8 ECM BMM DEN RSEL YSCROLL
+    ;   0   0   1   1    1    011
+    lda #%00111011 ; == $3b
     sta CONTROL_REG_1
 
-    lda CONTROL_REG_2
-    ora #%00010000 ; set bit 4
+    ; - - RES MCM CSEL XSCROLL
+    ; 0 0  0   1   1     000
+    lda #%00011000 ; == $18
     sta CONTROL_REG_2
+
+    ; setup bitmap offset
+    lda #$10|BITMAP/$400
+    sta MEMORY_POINTERS
 
     rts
 
