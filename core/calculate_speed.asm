@@ -44,6 +44,15 @@ decelerate:
     rts
 
 
+decelerate_quick:
+    lda CURRENT_SPEED
+    cmp #$00
+    beq noop
+    dec CURRENT_SPEED
+    dec CURRENT_SPEED
+    rts
+
+
 ; X - min bound
 ; Y - max bound
 accelerate_if_speed_between:
@@ -52,7 +61,7 @@ accelerate_if_speed_between:
     bcs decelerate ; >=
 .equal:
     cpy CURRENT_SPEED
-    bcc decelerate
+    bcc decelerate_quick ; engine braking
 
     lda #$ff
     cmp CURRENT_SPEED
