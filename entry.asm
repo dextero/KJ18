@@ -195,13 +195,13 @@ rest:
 ; /data/ ================
             
     org SPRITE_ADDRESS 
-    incbin "content/sprite_2.spr"
+    incbin "content/gearlever.spr"
 
     org SPRITE_ADDRESS + $40
     incbin "content/gearbox.spr"
 
     org SPRITE_ADDRESS + $80
-    incbin "content/muu.spr"
+    incbin "content/cow.spr"
 
 	org SPRITE_ADDRESS + $C0
     incbin "content/train.spr"
@@ -210,7 +210,7 @@ rest:
     incbin "content/gearbcg.spr"
 
 	org SPRITE_ADDRESS + $140
-    incbin "content/gearbcg.spr"
+	incbin "content/tree.spr"
 
     org $1000-$7e
     INCBIN "content/music.sid"

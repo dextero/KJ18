@@ -1,10 +1,45 @@
 
-
+; 0 - lever     (x: d000,y: d0001)
+; 1 - gearbox   (x: d002,y: d0003)
+; 2 - cow       (x: d004,y: d0005)
+; 3 - train     (x: d006,y: d0007)
+; 4 - gear bcg  (x: d008,y: d0009)
+; 5 - tree      (x: d00a,y: d000b)
 
 init_sprite:
 
-    ; sprite base colors
+    ; sprite multi colors
+    lda #15
+    sta $d025
 
+    lda #11
+    sta $d026
+	
+    ; enable sprite 
+    lda #%1111111
+    sta $d015
+
+	; scale 
+    lda #%00111110
+    sta $d017
+    sta $d01d
+
+    ; set multicolor
+    lda #%00001100
+    sta $d01c
+
+	jsr .load_sprites
+	jsr .set_positions
+	jsr .set_base_colors
+    rts
+
+clear_sprites:
+    lda #$00
+    sta $d015
+    rts
+
+
+.set_base_colors:
     ; lever
     lda #6
     sta $d027
@@ -25,15 +60,12 @@ init_sprite:
     lda #12
     sta $d02b
 
+	; tree
+    lda #9
+    sta $d02c
+	rts
 
-    ; sprite multi colors
-    lda #15
-    sta $d025
-
-    lda #11
-    sta $d026
-
-    ; load sprite
+.load_sprites:
     lda #GEAR_SPRITE_DATA 
     sta $07f8
 
@@ -49,13 +81,12 @@ init_sprite:
 	lda #GEAR_SPRITE_DATA + 4
     sta $07fc
 
-    ; enable sprite 
-    lda #%0011111
-    sta $d015
+	lda #GEAR_SPRITE_DATA + 5
+    sta $07fd
+	rts
 
-    ; set position
-
-    lda #GEAR_LEVER_CENTER_X
+.set_positions
+	lda #GEAR_LEVER_CENTER_X
     sta GEAR_LEVER_X	; sprite 1
 
     sec
@@ -84,18 +115,10 @@ init_sprite:
     lda #180
     sta $d007
 
-    ; scale 
-    lda #%00011110
-    sta $d017
-    sta $d01d
+	;ustaw tree
+    lda #150
+    sta $d00a
+    lda #120
+    sta $d00b
 
-    ; set multicolor
-    lda #%00001100
-    sta $d01c
-
-    rts
-
-clear_sprites:
-    lda #$00
-    sta $d015
-    rts
+	rts
