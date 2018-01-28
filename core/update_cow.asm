@@ -31,6 +31,12 @@ reset_cow:
     sta cow_enable_timeout+0
 
     jsr hide_cow
+
+    lda #COW_START_X
+    sta SPRITE_3_X
+    lda #COW_START_Y
+    sta SPRITE_3_Y
+
     rts
 
 
@@ -55,8 +61,6 @@ update_cow_timeout:
     bne .update_cow_timeout_ret
 
     ; timeout == 0
-    lda #0
-    sta SPRITE_3_X
     jsr show_cow
 
 .update_cow_timeout_ret:
@@ -110,9 +114,10 @@ update_cow:
 
     bcc .return
 
+    lda #%00001000
+    and SPRITE_3_X
+    beq .return
     inc SPRITE_3_Y
-
-    ; check if cow collided with train
 
 .return
     rts

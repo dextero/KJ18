@@ -76,6 +76,8 @@ COW_UNDERFLOW = 2053
 COW_VISIBLE = 2054
 LETHAL_SPEED = 100
 COW_SPRITE_SIZE = 32
+COW_START_X = 0
+COW_START_Y = 80
 
 GEAR_LEVER_X = $d000
 GEAR_LEVER_Y = $d001
@@ -141,9 +143,6 @@ init:
     lda #TRACK_COLOR
     sta SCREEN_LINE_COLOR
 
-    jsr reset_distance_traveled
-    jsr reset_cow
-
 ; =======================
 ; /methods/   ===========
 
@@ -156,6 +155,9 @@ main:
     jsr play_music
 
     jsr init_sprite
+
+    jsr reset_distance_traveled
+    jsr reset_cow
 
     jsr clear_screen
     jsr clear_sky
