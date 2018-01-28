@@ -12,10 +12,6 @@ MUSIC_PLAY_ADDR = $1003
 TEXT_COLOR = 0
 TEXT_BGCOLOR = 15
 
-JIFFIES_LO = $A2
-JIFFIES_MI = $A1
-JIFFIES_HI = $A0
-
 CONTROL_REG_1 = $d011
 CONTROL_REG_2 = $d016
 RASTER_COUNTER = $d012
@@ -82,17 +78,15 @@ CURRENT_SPEED = $35 ; unsigned, 0 - full stop, 255 - max
 SPEED_COUNTER = $36 ; slow speeds cause update every N-th frame
 
 TIMER_START_JIFFIES_LO = $37
-TIMER_START_JIFFIES_MI = $38
 TIMER_START_JIFFIES_HI = $39
 
 TIMER_ELAPSED_JIFFIES_LO = $3a
-TIMER_ELAPSED_JIFFIES_MI = $3b
 TIMER_ELAPSED_JIFFIES_HI = $3c
 
 SCREEN_LINE_COLOR = $3d
 
 FINISH_LINE_POS_LO = $0000
-FINISH_LINE_POS_HI = $0004
+FINISH_LINE_POS_HI = $0003
 
 ; reuse memory - these are never used while SCREEN_LINE_* vars are
 SCREEN_HLINE_ROW = SCREEN_LINE_SKEW
@@ -242,8 +236,3 @@ your_score_msg_1_size = . - your_score_msg_1
 
 your_score_msg_2 .byte "ARBITRARY UNITS OF TIME"
 your_score_msg_2_size = . - your_score_msg_2
-
-lowscore_msg_1 .byte "yOU WERE EMBARRASINGLY SLOW"
-lowscore_msg_1_size = . - lowscore_msg_1
-lowscore_msg_2 .byte "TO DELIVER THE STUFF"
-lowscore_msg_2_size = . - lowscore_msg_2
