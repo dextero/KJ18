@@ -154,6 +154,7 @@ rest:
     cmp #1
     bne loop
 
+    jsr timer_get_elapsed
     jsr highscore_screen
 
     rts
