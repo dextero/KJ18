@@ -1,6 +1,9 @@
 ; =======================
 ; /entry/   =============
 
+slowdown_factor = 2
+slowdown_counter .ds 1
+
 noop:
     rts
 
@@ -9,7 +12,17 @@ accelerate:
     cmp #$ff
     beq noop
 
+    inc slowdown_counter
+    lda slowdown_counter
+    cmp #slowdown_factor
+    bne .accelerate_later
+
+    lda #0
+    sta slowdown_counter
+
     inc CURRENT_SPEED
+
+.accelerate_later:
     rts
 
 
@@ -18,7 +31,17 @@ decelerate:
     cmp #$00
     beq noop
 
+    dec slowdown_counter
+    lda slowdown_counter
+    cmp #-slowdown_factor
+    bne .decelerate_later
+
+    lda #0
+    sta slowdown_counter
+
     dec CURRENT_SPEED
+
+.decelerate_later:
     rts
 
 
@@ -44,6 +67,12 @@ accelerate_if_speed_between:
 ; BUT if speed == 255 and would accelerate OR speed == 0 and would decelerate, do nothing
 ; otherwise, decelerate
 calculate_speed:
+    lda SPACE_STATE
+    beq .clutch_up
+
+    jmp decelerate
+
+.clutch_up:
 	lda CURRENT_SHIFTER_POS
 
     cmp #$00

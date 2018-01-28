@@ -35,10 +35,11 @@ GEAR_OFFSET = 16
 
 GEAR_CHANGE_LEEWAY = 5
 
-SCREEN = $400
-SCREEN_LINE_SIZE_B = 320/8
+SCREEN_SKY_LINES = 6
 SCREEN_STATUS_LINES = 4
-SCREEN_NUM_LINES = 200/8-SCREEN_STATUS_LINES
+SCREEN_LINE_SIZE_B = 320/8
+SCREEN_NUM_LINES = 200/8-SCREEN_SKY_LINES-SCREEN_STATUS_LINES
+SCREEN = $400+SCREEN_SKY_LINES*SCREEN_LINE_SIZE_B
 SCREEN_SIZE = SCREEN_NUM_LINES * SCREEN_LINE_SIZE_B
 SCREEN_END = SCREEN + SCREEN_SIZE
 
@@ -50,8 +51,8 @@ BITMAP_SIZE = BITMAP_END-BITMAP
 
 ; see draw_tracks
 TRACK_UPPER_X = 18
-TRACK_UPPER_WIDTH = 4
-LINE_SKEW = 3
+TRACK_UPPER_WIDTH = 1
+LINE_SKEW = 2
 
 ; =======================
 ; /variables/ ===========
@@ -75,7 +76,7 @@ MEMSET_SIZE_LO = $31
 MEMSET_SIZE_HI = $32
 
 SCREEN_HLINE_OFFSET = $33
-SCREEN_HLINE_STRIDE = $34
+SCREEN_HLINE_STRIDE = 8
 
 CURRENT_SPEED = $35 ; unsigned, 0 - full stop, 255 - max
 SPEED_COUNTER = $36 ; slow speeds cause update every N-th frame
@@ -84,10 +85,14 @@ TIMER_START_JIFFIES_LO = $37
 TIMER_START_JIFFIES_MI = $38
 TIMER_START_JIFFIES_HI = $39
 
-TIMER_ELAPSED_CENTISECONDS = $3a
-TIMER_ELAPSED_SECONDS = $3b
-TIMER_ELAPSED_MINUTES = $3c
+TIMER_ELAPSED_JIFFIES_LO = $3a
+TIMER_ELAPSED_JIFFIES_MI = $3b
+TIMER_ELAPSED_JIFFIES_HI = $3c
 
+SCREEN_LINE_COLOR = $3d
+
+FINISH_LINE_POS_LO = $0000
+FINISH_LINE_POS_HI = $0004
 
 ; reuse memory - these are never used while SCREEN_LINE_* vars are
 SCREEN_HLINE_ROW = SCREEN_LINE_SKEW
@@ -116,6 +121,7 @@ QUOTIENT = NUMERATOR
     lda #GEAR_LEVER_CENTER_Y
     sta GEAR_LEVER_Y
 
+    jsr reset_distance_traveled
 
 ; =======================
 ; /methods/   ===========
@@ -124,12 +130,12 @@ main:
     jsr creators_screen
     jsr title_screen
 
-
     jsr split_screen
     jsr play_music
 
     jsr clear_screen
     jsr draw_tracks
+    jsr timer_reset
 loop:
     ;handle movement
     jsr read_space
@@ -139,13 +145,18 @@ loop:
 rest:
 
     jsr calculate_speed
+    jsr update_distance_traveled
 
     jsr sync_screen
     jsr update_tracks
     jsr draw_speed
     
-    jmp loop
+    jsr is_finish_line_reached
+    cmp #1
+    bne loop
 
+    jsr disable_interrupts
+    jsr timer_get_elapsed
     jsr highscore_screen
 
     rts
@@ -170,6 +181,7 @@ rest:
     include "core/timer.asm"
     include "core/wait_for_space.asm"
     include "core/highscore_screen.asm"
+    include "core/update_distance_traveled.asm"
 
 ; =======================
 ; /data/ ================
