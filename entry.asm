@@ -144,6 +144,7 @@ loop:
 rest:
 
     jsr calculate_speed
+    jsr update_distance_traveled
 
     jsr sync_screen
     jsr update_tracks

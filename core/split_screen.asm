@@ -30,8 +30,6 @@ begin_raster:
 last_raster:
 	jsr text_mode
 
-    jsr update_distance_traveled
-
 	; muzig
 	jsr $1003
 
