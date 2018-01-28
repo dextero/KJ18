@@ -101,7 +101,7 @@ QUOTIENT = NUMERATOR
 ; =======================
 ; /init/ ================
 
-
+init:
     ;speed
     lda #0
     sta CURRENT_SPEED
@@ -160,6 +160,7 @@ rest:
     jsr timer_get_elapsed
     jsr highscore_screen
 
+    jmp init
     rts
 
 ; =======================
