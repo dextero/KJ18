@@ -71,10 +71,10 @@ update_hline_offset:
 
     bcc .update_hline_offset_nope ; don't update offset
 
-    ; offset = (offset + 1) % LINE_SKEW
+    ; offset = (offset + 1) % SCREEN_HLINE_STRIDE
     lda SCREEN_HLINE_OFFSET
     adc #1
-    cmp #LINE_SKEW
+    cmp #SCREEN_HLINE_STRIDE
 
     bpl .update_hline_offset_zero
 
@@ -121,7 +121,7 @@ update_tracks:
 ;
 ;        TRACK_UPPER_X
 ;                    |
-;                    v__________________ Y = 0
+;                    v__________________ TRACK_UPPER_Y
 ; TRACK_UPPER_WIDTH  /<-->\            ^
 ;                   /      \           | SCREEN_HLINE_OFFSET
 ;                  /        \          v
@@ -142,8 +142,6 @@ draw_tracks:
 
     lda SCREEN_HLINE_OFFSET
     sta SCREEN_HLINE_ROW
-    lda #LINE_SKEW+1
-    sta SCREEN_HLINE_STRIDE
     jsr draw_horizontal_lines
     rts
 
@@ -212,7 +210,7 @@ draw_horizontal_lines:
     ;     SCREEN_HLINE_ROW += SCREEN_HLINE_STRIDE
     lda SCREEN_HLINE_ROW
     clc
-    adc SCREEN_HLINE_STRIDE
+    adc #SCREEN_HLINE_STRIDE
     sta SCREEN_HLINE_ROW
     ; }
     cmp #SCREEN_NUM_LINES
