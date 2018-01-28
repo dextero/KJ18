@@ -23,7 +23,7 @@ JOYSTICK_ADDR  = $DC00
 
 COLOR_MODE_RASTER = 220
 
-SPRITE_ADDRESS = $0e40
+SPRITE_ADDRESS = $0e00
 GEAR_SPRITE_DATA = SPRITE_ADDRESS / $40
 GEAR_LEVER_CENTER_X = $D5
 GEAR_LEVER_CENTER_Y = $DC
@@ -204,6 +204,9 @@ rest:
     incbin "content/train.spr"
 
 	org SPRITE_ADDRESS + $100
+    incbin "content/gearbcg.spr"
+
+	org SPRITE_ADDRESS + $140
     incbin "content/gearbcg.spr"
 
     org $1000-$7e
