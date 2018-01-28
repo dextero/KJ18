@@ -1,14 +1,54 @@
-reset_cow:
-    lda #0
-    sta SPRITE_3_X
+cow_enable_timeout .ds 2
+COW_TIMEOUT = $0200
 
-    lda #1
+
+reset_cow:
+    lda #>COW_TIMEOUT
+    sta cow_enable_timeout+1
+    lda #<COW_TIMEOUT
+    sta cow_enable_timeout+0
+
+    lda #0
     sta COW_VISIBLE
 
     rts
 
 
+; returns: A = 1 if cow on timeout
+;          A = 0 if cow active
+update_cow_timeout:
+    lda #0
+    cmp cow_enable_timeout+1
+    bne .update_cow_timeout_continue
+
+    cmp cow_enable_timeout+0
+    bne .update_cow_timeout_continue
+
+    lda #1
+    rts
+
+.update_cow_timeout_continue:
+    lda #0
+    dec cow_enable_timeout+0
+    bne .update_cow_timeout_ret
+    dec cow_enable_timeout+1
+    bne .update_cow_timeout_ret
+
+    ; timeout == 0
+    lda #0
+    sta SPRITE_3_X
+    lda #1
+    sta COW_VISIBLE
+
+.update_cow_timeout_ret:
+    rts
+
+
 update_cow:
+    jsr update_cow_timeout
+    cmp #1
+    bne .return
+
     ; check if cow is visible
     lda COW_VISIBLE
     cmp #00
@@ -38,7 +78,7 @@ update_cow:
 
 .no_collision:
     ; HACK
-    lda #<SCREEN_LINE_SIZE_PIX-1
+    lda #$ff
     cmp SPRITE_3_X
     bne .continue
 
