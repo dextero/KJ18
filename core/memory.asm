@@ -67,3 +67,15 @@ cpyspr:
     bne .write
 
     endm
+
+    mac text_color
+.col SET {1}
+    lda #.col
+    sta $0286
+    endm
+
+    mac text_bgcolor
+.col SET {1}
+    lda #.col
+    sta $d021
+    endm

@@ -3,10 +3,8 @@
 
 highscore_screen:
     ; set colors
-    lda #TITLE_BCG
-    sta $d020
-    lda #TITLE_BORDER
-    sta $d021
+    text_color TEXT_COLOR
+    text_bgcolor TEXT_BGCOLOR
 
     jsr text_mode
 
@@ -21,11 +19,11 @@ highscore_screen:
     jsr $fff0
 
     ; setup font position
-    lda #$16 
+    lda #$16
     sta $d018
 
     ldx #$00
-.write_title:      
+.write_title:
     lda    highscore_msg,x
     jsr    $ffd2
     inx
@@ -34,8 +32,8 @@ highscore_screen:
 
     ldx #$00
 
-.setcolor:  
-    lda #TITLE_BCG
+.setcolor:
+    lda #TEXT_BGCOLOR
     sta $d800,x
     inx
     cpx #highscore_msg_size
@@ -44,5 +42,3 @@ highscore_screen:
     jsr wait_for_space
 
     rts
-
-    

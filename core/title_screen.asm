@@ -3,10 +3,8 @@
 
 title_screen:
     ; set colors
-    lda #TITLE_BCG
-    sta $d020
-    lda #TITLE_BORDER
-    sta $d021
+    text_color TEXT_COLOR
+    text_bgcolor TEXT_BGCOLOR
 
     jsr text_mode
 
@@ -35,7 +33,7 @@ write_title:
     ldx #$00
 
 setcolor:  
-    lda #TITLE_BCG
+    lda #TEXT_BGCOLOR
     sta $d800,x
     inx
     cpx #title_msg_size
@@ -44,5 +42,3 @@ setcolor:
     jsr wait_for_space
 
     rts
-
-    
