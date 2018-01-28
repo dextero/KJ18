@@ -19,7 +19,7 @@ highscore_screen:
     write highscore_msg, highscore_msg_size
 
     lda TIMER_ELAPSED_JIFFIES_HI
-    jeq .highscore_print
+    beq .highscore_print
 
     ; oh fuck, a 3-byte number of jiffies
     ; how does one print that?
@@ -27,7 +27,7 @@ highscore_screen:
     move_cursor 10, 7
     write lowscore_msg, lowscore_msg_size
 
-    jmp .highscore_skip_print
+    jmp .highscore_skip_print
 
 .highscore_print:
     move_cursor 10, 7
