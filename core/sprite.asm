@@ -116,9 +116,9 @@ clear_sprites:
     sta $d007
 
     ;ustaw tree
-    lda #40
+    lda #100
     sta $d00a
-    lda #120
+    lda #70
     sta $d00b
 
 	rts
