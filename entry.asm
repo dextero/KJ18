@@ -23,9 +23,10 @@ JOYSTICK_ADDR  = $DC00
 
 COLOR_MODE_RASTER = 220
 
-GEAR_SPRITE_DATA = $80
-GEAR_LEVER_CENTER_X = $25
-GEAR_LEVER_CENTER_Y = $D6
+SPRITE_ADDRESS = $0e80
+GEAR_SPRITE_DATA = SPRITE_ADDRESS / $40
+GEAR_LEVER_CENTER_X = $D5
+GEAR_LEVER_CENTER_Y = $DC
 
 GEAR_OFFSET = 16
 
@@ -115,11 +116,6 @@ BORDER_COLOR = 15
     sta CURRENT_SHIFTER_POS 
 
     ;sprite
-    lda #GEAR_LEVER_CENTER_X
-    sta GEAR_LEVER_X
-
-    lda #GEAR_LEVER_CENTER_Y
-    sta GEAR_LEVER_Y
 
     lda #TRACK_COLOR
     sta SCREEN_LINE_COLOR
@@ -137,16 +133,15 @@ main:
     jsr split_screen
     jsr play_music
 
+    jsr init_sprite
+
     jsr clear_screen
-	jsr clear_sky
+    jsr clear_sky
     jsr draw_tracks
     jsr timer_reset
 
     lda #BORDER_COLOR
     sta $d020
-
-
-
 
 loop:
     ;handle movement
@@ -168,11 +163,13 @@ rest:
 
     bne loop
 
+    jsr clear_sprites
+
     jsr disable_interrupts
     jsr timer_get_elapsed
     jsr highscore_screen
 
-    rts
+    jmp main
 
 ; =======================
 ; /includes/ ============
@@ -195,15 +192,19 @@ rest:
     include "core/wait_for_space.asm"
     include "core/highscore_screen.asm"
     include "core/update_distance_traveled.asm"
+    include "core/sprite.asm"
 
 ; =======================
 ; /data/ ================
             
+    org SPRITE_ADDRESS 
+    incbin "content/sprite_2.spr"
+
+    org SPRITE_ADDRESS + $40
+    incbin "content/gearbox.spr"
+
     org $1000-$7e
     INCBIN "content/music.sid"
-
-    org $1FC0
-    incbin "content/sprite.spr"
 
     org BITMAP
     ; set bitmap to 01010101 pattern
