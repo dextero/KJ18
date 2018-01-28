@@ -203,6 +203,9 @@ rest:
 	org SPRITE_ADDRESS + $C0
     incbin "content/train.spr"
 
+	org SPRITE_ADDRESS + $100
+    incbin "content/gearbcg.spr"
+
     org $1000-$7e
     INCBIN "content/music.sid"
 
