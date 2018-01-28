@@ -54,7 +54,6 @@ cpyspr:
 
     endm
 
-
     mac write
 .text SET {1}
 .size SET {2}
@@ -68,7 +67,6 @@ cpyspr:
     bne .write
 
     endm
-
 
     mac move_cursor
 .x SET {1}

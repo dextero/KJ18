@@ -11,34 +11,27 @@ title_screen:
     ; clear screen
     jsr $e544
 
-
-    ; move cursor
-    clc
-    ldx #10
-    ldy #15
-    jsr $fff0
-
     ; setup font position
     lda #$16 
     sta $d018
 
-    ldx #$00
-write_title:      
-    lda    title_msg,x
-    jsr    $ffd2
-    inx
-    cpx    #title_msg_size
-    bne    write_title
 
-    ldx #$00
-
-setcolor:  
-    lda #TEXT_BGCOLOR
-    sta $d800,x
-    inx
-    cpx #title_msg_size
-    bne setcolor
+    lda title_screen_msg
+    jsr draw_screen_text
 
     jsr wait_for_space
+    rts
+
+
+; main address from A
+draw_screen_text: 
+    
+    write title_screen_msg, 200
+    write title_screen_msg + 200, 200
+    write title_screen_msg + 400, 200
+    write title_screen_msg + 600, 100
+
+   
 
     rts
+

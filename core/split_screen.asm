@@ -15,6 +15,7 @@ split_screen:
 begin_raster:
 	jsr multicolor_mode
 
+
 	; chaining
 	lda #<last_raster
 	ldx #>last_raster
