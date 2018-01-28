@@ -33,6 +33,10 @@ last_raster:
 	; muzig
 	jsr $1003
 
+    inc TIMER_LO
+    bne .timer_no_carry
+    inc TIMER_HI
+.timer_no_carry:
 
 	; chaining
 	lda #<begin_raster
