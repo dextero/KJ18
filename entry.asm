@@ -54,6 +54,12 @@ TRACK_UPPER_X = 18
 TRACK_UPPER_WIDTH = 1
 LINE_SKEW = 2
 
+SPRITE_MASK = $d015
+SPRITE_DOUBLE_WIDTH = $d01d
+SPRITE_DOUBLE_HEIGHT = $d017
+
+SPRITE_COW_BIT = %00000100
+
 SPRITE_2_X = $d002
 SPRITE_2_Y = $d003
 
@@ -74,10 +80,12 @@ CURRENT_SHIFTER_POS = 2050
 TITLE_SELECTED = 2051
 JOYSTICK_FIRE = 2052
 
-COW_UNDERFLOW = 2052
-COW_VISIBLE = 2053
+COW_UNDERFLOW = 2053
+COW_VISIBLE = 2054
 LETHAL_SPEED = 100
 COW_SPRITE_SIZE = 32
+COW_START_X = 0
+COW_START_Y = 80
 
 
 GEAR_LEVER_X = $d000
@@ -145,9 +153,6 @@ init:
     lda #TRACK_COLOR
     sta SCREEN_LINE_COLOR
 
-    jsr reset_distance_traveled
-    jsr reset_cow
-
 ; =======================
 ; /methods/   ===========
 
@@ -160,6 +165,9 @@ main:
     jsr play_music
 
     jsr init_sprite
+
+    jsr reset_distance_traveled
+    jsr reset_cow
 
     jsr clear_screen
     jsr clear_sky

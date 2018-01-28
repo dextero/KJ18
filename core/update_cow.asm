@@ -1,18 +1,100 @@
-reset_cow:
-    lda #0
-    sta SPRITE_3_X
+cow_enable_timeout .ds 2
+COW_TIMEOUT = $0200
 
-    lda #1
-    sta COW_VISIBLE
+
+hide_cow:
+    lda #SPRITE_COW_BIT ^ $ff
+    and SPRITE_MASK
+    sta SPRITE_MASK
+    rts
+
+
+show_cow:
+    lda #SPRITE_COW_BIT
+    ora SPRITE_MASK
+    sta SPRITE_MASK
+    rts
+
+
+; sets Z if not visible
+is_cow_visible:
+    lda SPRITE_MASK
+    and #SPRITE_COW_BIT
+    rts
+
+
+zoom_cow:
+    lda #SPRITE_COW_BIT
+    ora SPRITE_DOUBLE_WIDTH
+    sta SPRITE_DOUBLE_WIDTH
+    lda #SPRITE_COW_BIT
+    ora SPRITE_DOUBLE_HEIGHT
+    sta SPRITE_DOUBLE_HEIGHT
+    rts
+
+
+shrink_cow:
+    lda #SPRITE_COW_BIT ^ $ff
+    and SPRITE_DOUBLE_WIDTH
+    sta SPRITE_DOUBLE_WIDTH
+    lda #SPRITE_COW_BIT ^ $ff
+    and SPRITE_DOUBLE_HEIGHT
+    sta SPRITE_DOUBLE_HEIGHT
+    rts
+
+
+reset_cow:
+    lda #>COW_TIMEOUT
+    sta cow_enable_timeout+1
+    lda #<COW_TIMEOUT
+    sta cow_enable_timeout+0
+
+    jsr hide_cow
+    jsr shrink_cow
+
+    lda #COW_START_X
+    sta SPRITE_3_X
+    lda #COW_START_Y
+    sta SPRITE_3_Y
 
     rts
 
 
+; returns: A = 1 if cow on timeout
+;          A = 0 if cow active
+update_cow_timeout:
+    lda #0
+    cmp cow_enable_timeout+1
+    bne .update_cow_timeout_continue
+
+    cmp cow_enable_timeout+0
+    bne .update_cow_timeout_continue
+
+    lda #1
+    rts
+
+.update_cow_timeout_continue:
+    lda #0
+    dec cow_enable_timeout+0
+    bne .update_cow_timeout_ret
+    dec cow_enable_timeout+1
+    bne .update_cow_timeout_ret
+
+    ; timeout == 0
+    jsr show_cow
+
+.update_cow_timeout_ret:
+    rts
+
+
 update_cow:
+    jsr update_cow_timeout
+    cmp #1
+    bne .return
+
     ; check if cow is visible
-    lda COW_VISIBLE
-    cmp #00
-    beq .return
+    jsr is_cow_visible
+    beq .return ; cow invisible
 
     inc SPRITE_3_X
 
@@ -38,7 +120,7 @@ update_cow:
 
 .no_collision:
     ; HACK
-    lda #<SCREEN_LINE_SIZE_PIX-1
+    lda #$ff
     cmp SPRITE_3_X
     bne .continue
 
@@ -52,9 +134,16 @@ update_cow:
 
     bcc .return
 
-    inc SPRITE_3_Y
+    lda #%00001000
+    and SPRITE_3_X
+    beq .return
 
-    ; check if cow collided with train
+    inc SPRITE_3_Y
+    lda #COW_START_Y+SCREEN_LINE_SIZE_PIX/8/2
+    cmp SPRITE_3_Y
+    bcs .return
+
+    jsr zoom_cow
 
 .return
     rts
