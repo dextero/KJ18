@@ -3,8 +3,7 @@ COW_TIMEOUT = $0200
 
 
 hide_cow:
-    lda #SPRITE_COW_BIT
-    eor #$ff
+    lda #SPRITE_COW_BIT ^ $ff
     and SPRITE_MASK
     sta SPRITE_MASK
     rts
@@ -24,6 +23,26 @@ is_cow_visible:
     rts
 
 
+zoom_cow:
+    lda #SPRITE_COW_BIT
+    ora SPRITE_DOUBLE_WIDTH
+    sta SPRITE_DOUBLE_WIDTH
+    lda #SPRITE_COW_BIT
+    ora SPRITE_DOUBLE_HEIGHT
+    sta SPRITE_DOUBLE_HEIGHT
+    rts
+
+
+shrink_cow:
+    lda #SPRITE_COW_BIT ^ $ff
+    and SPRITE_DOUBLE_WIDTH
+    sta SPRITE_DOUBLE_WIDTH
+    lda #SPRITE_COW_BIT ^ $ff
+    and SPRITE_DOUBLE_HEIGHT
+    sta SPRITE_DOUBLE_HEIGHT
+    rts
+
+
 reset_cow:
     lda #>COW_TIMEOUT
     sta cow_enable_timeout+1
@@ -31,6 +50,7 @@ reset_cow:
     sta cow_enable_timeout+0
 
     jsr hide_cow
+    jsr shrink_cow
 
     lda #COW_START_X
     sta SPRITE_3_X
@@ -117,7 +137,13 @@ update_cow:
     lda #%00001000
     and SPRITE_3_X
     beq .return
+
     inc SPRITE_3_Y
+    lda #COW_START_Y+SCREEN_LINE_SIZE_PIX/8/2
+    cmp SPRITE_3_Y
+    bcs .return
+
+    jsr zoom_cow
 
 .return
     rts
