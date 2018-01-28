@@ -1,9 +1,7 @@
 draw_speed:
-    ; WTF IS GOING ON HERE
-    ; WHY DOES THAT WORK WITH 240 AND 25
     clc
-    ldx #22;#240
-    ldy #5;#25
+    ldx #22
+    ldy #5
     jsr $fff0
 
     write speed_msg, speed_msg_size
@@ -12,7 +10,19 @@ draw_speed:
     LDX CURRENT_SPEED
     JSR $BDCD
 
-    ; lol
+    clc
+    ldx #23
+    ldy #5
+    jsr $fff0
+
+    write rpm_msg, rpm_msg_size
+    ; draw number
+    jsr get_rpm_x100
+    tax
+    lda #0
+    JSR $BDCD
+
+    write rpm_suffix, rpm_suffix_size
     write spaces, spaces_size
 
     rts
