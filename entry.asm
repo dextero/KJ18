@@ -121,6 +121,9 @@ QUOTIENT = NUMERATOR
     lda #GEAR_LEVER_CENTER_Y
     sta GEAR_LEVER_Y
 
+    lda #$ff
+    sta SCREEN_LINE_COLOR
+
     jsr reset_distance_traveled
 
 ; =======================
