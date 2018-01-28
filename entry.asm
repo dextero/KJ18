@@ -101,11 +101,14 @@ NUMERATOR = $FD
 DENUMERATOR = $FC
 QUOTIENT = NUMERATOR
 
+SKY_COLOR = 03
 FIRST_COLOR = 05
 TRACK_COLOR = $ff
+BORDER_COLOR = 15
 
 ; =======================
 ; /init/ ================
+
 
 
     ;speed
@@ -124,7 +127,7 @@ TRACK_COLOR = $ff
     lda #GEAR_LEVER_CENTER_Y
     sta GEAR_LEVER_Y
 
-    lda #$ff
+    lda #TRACK_COLOR
     sta SCREEN_LINE_COLOR
 
     jsr reset_distance_traveled
@@ -141,8 +144,15 @@ main:
     jsr play_music
 
     jsr clear_screen
+	jsr clear_sky
     jsr draw_tracks
     jsr timer_reset
+
+    lda #BORDER_COLOR
+    sta $d020
+
+
+
 
 loop:
     ;handle movement
@@ -161,6 +171,7 @@ rest:
     
     jsr is_finish_line_reached
     cmp #1
+
     bne loop
 
     jsr disable_interrupts
@@ -197,8 +208,8 @@ rest:
     org $1000-$7e
     INCBIN "content/music.sid"
 
-   ; org $2000
-   ; incbin "content/sprite.spr"
+    org $1FC0
+    incbin "content/sprite.spr"
 
     org BITMAP
     ; set bitmap to 01010101 pattern

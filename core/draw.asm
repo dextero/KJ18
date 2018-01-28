@@ -37,6 +37,22 @@ memset16_final_block:
 
     rts
 
+clear_sky subroutine
+    lda #<$400
+    sta MEMSET_ADDR_LO
+    lda #>$400
+    sta MEMSET_ADDR_HI
+
+    lda #<SCREEN_SKY_LINES*SCREEN_LINE_SIZE_B
+    sta MEMSET_SIZE_LO
+    lda #>SCREEN_SKY_LINES*SCREEN_LINE_SIZE_B
+    sta MEMSET_SIZE_HI
+
+    lda #SKY_COLOR
+    jsr memset16
+
+    rts
+
 ; zero-initializes SCREEN
 clear_screen subroutine
     lda #<SCREEN
