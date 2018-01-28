@@ -54,6 +54,7 @@ cpyspr:
 
     endm
 
+
     mac write
 .text SET {1}
 .size SET {2}
@@ -66,4 +67,29 @@ cpyspr:
     cpx #.size
     bne .write
 
+    endm
+
+
+    mac move_cursor
+.x SET {1}
+.y SET {2}
+
+    clc
+    ldx #.y ; yup
+    ldy #.x
+    jsr $fff0
+    endm
+
+
+    mac text_color
+.col SET {1}
+    lda #.col
+    sta $0286
+    endm
+
+
+    mac text_bgcolor
+.col SET {1}
+    lda #.col
+    sta $d021
     endm

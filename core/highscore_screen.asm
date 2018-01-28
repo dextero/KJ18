@@ -3,39 +3,51 @@
 
 highscore_screen:
     ; set colors
-    lda #TITLE_BCG
-    sta $d020
-    lda #TITLE_BORDER
-    sta $d021
+    text_color TEXT_COLOR
+    text_bgcolor TEXT_BGCOLOR
 
     jsr text_mode
 
     ; clear screen
     jsr $e544
 
-
-    ; move cursor
-    clc
-    ldx #10
-    ldy #15
-    jsr $fff0
-
     ; setup font position
-    lda #$16 
+    lda #$16
     sta $d018
 
-    ldx #$00
-.write_title:      
-    lda    highscore_msg,x
-    jsr    $ffd2
-    inx
-    cpx    #highscore_msg_size
-    bne    .write_title
+    move_cursor (40-#highscore_msg_size)/2, 9
+    write highscore_msg, highscore_msg_size
+
+    lda TIMER_ELAPSED_JIFFIES_HI
+    beq .highscore_print
+
+    ; oh fuck, a 3-byte number of jiffies
+    ; how does one print that?
+    ; insult the player instead
+    move_cursor (40-#lowscore_msg_1_size)/2, 13
+    write lowscore_msg_1, lowscore_msg_1_size
+    move_cursor (40-#lowscore_msg_2_size)/2, 14
+    write lowscore_msg_2, lowscore_msg_2_size
+
+    jmp .highscore_skip_print
+
+.highscore_print:
+    move_cursor (40-#your_score_msg_1_size)/2, 11
+    write your_score_msg_1, your_score_msg_1_size
+
+    move_cursor (40-5)/2, 13
+    lda TIMER_ELAPSED_JIFFIES_MI
+    ldx TIMER_ELAPSED_JIFFIES_LO
+    jsr $bdcd
+
+    move_cursor (40-#your_score_msg_2_size)/2, 15
+    write your_score_msg_2, your_score_msg_2_size
+
+.highscore_skip_print:
 
     ldx #$00
-
-.setcolor:  
-    lda #TITLE_BCG
+.setcolor:
+    lda #TEXT_BGCOLOR
     sta $d800,x
     inx
     cpx #highscore_msg_size
@@ -44,5 +56,3 @@ highscore_screen:
     jsr wait_for_space
 
     rts
-
-    

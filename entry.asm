@@ -9,8 +9,8 @@
 MUSIC_LOAD_ADDR = $1000
 MUSIC_PLAY_ADDR = $1003
 
-TITLE_BCG = $13
-TITLE_BORDER = $04
+TEXT_COLOR = 0
+TEXT_BGCOLOR = 15
 
 JIFFIES_LO = $A2
 JIFFIES_MI = $A1
@@ -124,6 +124,9 @@ TRACK_COLOR = $ff
     lda #GEAR_LEVER_CENTER_Y
     sta GEAR_LEVER_Y
 
+    lda #$ff
+    sta SCREEN_LINE_COLOR
+
     jsr reset_distance_traveled
 
 ; =======================
@@ -220,5 +223,16 @@ spaces_size = . - spaces
 title_msg	.byte "maly penis farme mial, ia, ia ou"
 title_msg_size = . - title_msg
 
-highscore_msg	.byte "mamo, gdzie ja jestem"
+highscore_msg	.byte "stuff delivered"
 highscore_msg_size = . - highscore_msg
+
+your_score_msg_1 .byte "yOU TRAINSMITTED SOME STUFF IN"
+your_score_msg_1_size = . - your_score_msg_1
+
+your_score_msg_2 .byte "ARBITRARY UNITS OF TIME"
+your_score_msg_2_size = . - your_score_msg_2
+
+lowscore_msg_1 .byte "yOU WERE EMBARRASINGLY SLOW"
+lowscore_msg_1_size = . - lowscore_msg_1
+lowscore_msg_2 .byte "TO DELIVER THE STUFF"
+lowscore_msg_2_size = . - lowscore_msg_2
