@@ -101,6 +101,9 @@ NUMERATOR = $FD
 DENUMERATOR = $FC
 QUOTIENT = NUMERATOR
 
+FIRST_COLOR = 05
+TRACK_COLOR = $ff
+
 ; =======================
 ; /init/ ================
 
@@ -127,6 +130,7 @@ QUOTIENT = NUMERATOR
 ; /methods/   ===========
 
 main: 
+
     jsr creators_screen
     jsr title_screen
 
@@ -136,6 +140,7 @@ main:
     jsr clear_screen
     jsr draw_tracks
     jsr timer_reset
+
 loop:
     ;handle movement
     jsr read_space

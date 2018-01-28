@@ -49,7 +49,7 @@ clear_screen subroutine
     lda #>SCREEN_SIZE
     sta MEMSET_SIZE_HI
 
-    lda #0
+    lda #FIRST_COLOR
     jsr memset16
 
     rts
@@ -99,7 +99,7 @@ update_tracks:
     ; draw lines in black
     pha
 
-    lda #$00
+    lda #FIRST_COLOR
     sta SCREEN_LINE_COLOR
     jsr draw_tracks
 
@@ -107,7 +107,7 @@ update_tracks:
     pla
     sta SCREEN_HLINE_OFFSET
 
-    lda #$ff
+    lda #TRACK_COLOR
     sta SCREEN_LINE_COLOR
     jsr draw_tracks
 
