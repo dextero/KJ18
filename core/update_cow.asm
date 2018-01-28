@@ -2,15 +2,35 @@ cow_enable_timeout .ds 2
 COW_TIMEOUT = $0200
 
 
+hide_cow:
+    lda #SPRITE_COW_BIT
+    eor #$ff
+    and SPRITE_MASK
+    sta SPRITE_MASK
+    rts
+
+
+show_cow:
+    lda #SPRITE_COW_BIT
+    ora SPRITE_MASK
+    sta SPRITE_MASK
+    rts
+
+
+; sets Z if not visible
+is_cow_visible:
+    lda SPRITE_MASK
+    and #SPRITE_COW_BIT
+    rts
+
+
 reset_cow:
     lda #>COW_TIMEOUT
     sta cow_enable_timeout+1
     lda #<COW_TIMEOUT
     sta cow_enable_timeout+0
 
-    lda #0
-    sta COW_VISIBLE
-
+    jsr hide_cow
     rts
 
 
@@ -37,8 +57,7 @@ update_cow_timeout:
     ; timeout == 0
     lda #0
     sta SPRITE_3_X
-    lda #1
-    sta COW_VISIBLE
+    jsr show_cow
 
 .update_cow_timeout_ret:
     rts
@@ -50,9 +69,8 @@ update_cow:
     bne .return
 
     ; check if cow is visible
-    lda COW_VISIBLE
-    cmp #00
-    beq .return
+    jsr is_cow_visible
+    beq .return ; cow invisible
 
     inc SPRITE_3_X
 
