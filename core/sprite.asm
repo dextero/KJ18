@@ -121,4 +121,4 @@ clear_sprites:
     lda #70
     sta $d00b
 
-	rts
+    rts
