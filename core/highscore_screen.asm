@@ -18,32 +18,16 @@ highscore_screen:
     move_cursor (40-#highscore_msg_size)/2, 9
     write highscore_msg, highscore_msg_size
 
-    lda TIMER_ELAPSED_JIFFIES_HI
-    beq .highscore_print
-
-    ; oh fuck, a 3-byte number of jiffies
-    ; how does one print that?
-    ; insult the player instead
-    move_cursor (40-#lowscore_msg_1_size)/2, 13
-    write lowscore_msg_1, lowscore_msg_1_size
-    move_cursor (40-#lowscore_msg_2_size)/2, 14
-    write lowscore_msg_2, lowscore_msg_2_size
-
-    jmp .highscore_skip_print
-
-.highscore_print:
     move_cursor (40-#your_score_msg_1_size)/2, 11
     write your_score_msg_1, your_score_msg_1_size
 
     move_cursor (40-5)/2, 13
-    lda TIMER_ELAPSED_JIFFIES_MI
+    lda TIMER_ELAPSED_JIFFIES_HI
     ldx TIMER_ELAPSED_JIFFIES_LO
     jsr $bdcd
 
     move_cursor (40-#your_score_msg_2_size)/2, 15
     write your_score_msg_2, your_score_msg_2_size
-
-.highscore_skip_print:
 
     ldx #$00
 .setcolor:
