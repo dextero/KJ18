@@ -129,7 +129,6 @@ main:
     jsr creators_screen
     jsr title_screen
 
-
     jsr split_screen
     jsr play_music
 
@@ -154,6 +153,7 @@ rest:
     cmp #1
     bne loop
 
+    jsr disable_interrupts
     jsr timer_get_elapsed
     jsr highscore_screen
 
