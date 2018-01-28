@@ -44,6 +44,12 @@ accelerate_if_speed_between:
 ; BUT if speed == 255 and would accelerate OR speed == 0 and would decelerate, do nothing
 ; otherwise, decelerate
 calculate_speed:
+    lda SPACE_STATE
+    beq .clutch_up
+
+    jmp decelerate
+
+.clutch_up:
 	lda CURRENT_SHIFTER_POS
 
     cmp #$00
