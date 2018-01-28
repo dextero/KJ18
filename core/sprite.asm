@@ -17,6 +17,10 @@ init_sprite:
     lda #$01
     sta $d029
 
+ ; pociag
+    lda #$00
+    sta $d02a
+
     ; sprite multi colors
     lda #15
     sta $d025
@@ -34,8 +38,11 @@ init_sprite:
     lda #GEAR_SPRITE_DATA + 2
     sta $07fa
 
+    lda #GEAR_SPRITE_DATA + 3
+    sta $07fb
+
     ; enable sprite 
-    lda #%0000111
+    lda #%0001111
     sta $d015
 
     ; set position
@@ -54,25 +61,29 @@ init_sprite:
     sbc #12
     sta SPRITE_2_Y		
 
-
+    ; ustaw krowke
     lda #$20
     sta SPRITE_3_X
 
     lda #$60
     sta SPRITE_3_Y
 
+    ;ustaw pociag
+    lda #150
+    sta $d006
+    lda #180
+    sta $d007
+
     ; scale 
-    lda #%00000110
+    lda #%00001110
     sta $d017
     sta $d01d
 
     ; set multicolor
-    lda #%00000110
+    lda #%00001110
     sta $d01c
 
     rts
-
-
 
 clear_sprites:
     lda #$00

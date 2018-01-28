@@ -23,7 +23,7 @@ JOYSTICK_ADDR  = $DC00
 
 COLOR_MODE_RASTER = 220
 
-SPRITE_ADDRESS = $0ec0
+SPRITE_ADDRESS = $0e40
 GEAR_SPRITE_DATA = SPRITE_ADDRESS / $40
 GEAR_LEVER_CENTER_X = $D5
 GEAR_LEVER_CENTER_Y = $DC
@@ -45,7 +45,6 @@ BITMAP = $2000
 BITMAP_END = $4000
 BITMAP_SIZE = BITMAP_END-BITMAP
 
-
 ; see draw_tracks
 TRACK_UPPER_X = 18
 TRACK_UPPER_WIDTH = 1
@@ -63,7 +62,10 @@ SPRITE_3_Y = $d005
 JOYSTICK_STATE = 2048
 SPACE_STATE = 2049
 CURRENT_SHIFTER_POS = 2050
-COW_UNDERFLOW = 2051
+TITLE_SELECTED = 2051
+
+COW_UNDERFLOW = 2052
+COW_VISIBLE = 2053
 
 GEAR_LEVER_X = $d000
 GEAR_LEVER_Y = $d001
@@ -110,12 +112,12 @@ BORDER_COLOR = 15
 ; =======================
 ; /init/ ================
 
-
-
     ;speed
     lda #0
     sta CURRENT_SPEED
     sta SPACE_STATE
+    sta TITLE_SELECTED
+	sta COW_VISIBLE
 
     ;shifter
     lda #$04 
@@ -179,6 +181,36 @@ rest:
     jmp main
 
 ; =======================
+; /data/ ================
+            
+    org SPRITE_ADDRESS 
+    incbin "content/sprite_2.spr"
+
+    org SPRITE_ADDRESS + $40
+    incbin "content/gearbox.spr"
+
+    org SPRITE_ADDRESS + $80
+    incbin "content/muu.spr"
+
+	org SPRITE_ADDRESS + $C0
+    incbin "content/train.spr"
+
+    org $1000-$7e
+    INCBIN "content/music.sid"
+
+    org BITMAP
+    ; set bitmap to 01010101 pattern
+    ; this way it is overridden with SCREEN
+    ; 00 - draw BITMAP
+    ; 01 - draw SCREEN (color = high nibble of SCREEN pixel)
+    ; 10 - draw SCREEN (color = low nibble of SCREEN pixel)
+    ; 11 - draw SCREEN (get color from COLOR_RAM[pixel])
+    ds BITMAP_SIZE,$aa
+
+    org    $5FFE
+    incbin "content/creators_screen.prg"
+
+    ; =======================
 ; /includes/ ============
     include "core/split_screen.asm"
     include "core/init_interupts.asm"
@@ -202,43 +234,12 @@ rest:
     include "core/sprite.asm"
     include "core/update_cow.asm"
 
-; =======================
-; /data/ ================
-            
-    org SPRITE_ADDRESS 
-    incbin "content/sprite_2.spr"
-
-    org SPRITE_ADDRESS + $40
-    incbin "content/gearbox.spr"
-
-    org SPRITE_ADDRESS + $80
-    incbin "content/muu.spr"
-
-    org $1000-$7e
-    INCBIN "content/music.sid"
-
-    org BITMAP
-    ; set bitmap to 01010101 pattern
-    ; this way it is overridden with SCREEN
-    ; 00 - draw BITMAP
-    ; 01 - draw SCREEN (color = high nibble of SCREEN pixel)
-    ; 10 - draw SCREEN (color = low nibble of SCREEN pixel)
-    ; 11 - draw SCREEN (get color from COLOR_RAM[pixel])
-    ds BITMAP_SIZE,$aa
-
-    org    $5FFE
-    incbin "content/creators_screen.prg"
-
-   
 speed_msg .byte "SPEED: ";
 speed_msg_size = . - speed_msg
 gear_msg .byte " G: ";
 gear_msg_size = . - gear_msg
 spaces .byte "     "
 spaces_size = . - spaces
-
-title_msg	.byte "maly penis farme mial, ia, ia ou"
-title_msg_size = . - title_msg
 
 highscore_msg	.byte "stuff delivered"
 highscore_msg_size = . - highscore_msg
@@ -248,3 +249,27 @@ your_score_msg_1_size = . - your_score_msg_1
 
 your_score_msg_2 .byte "ARBITRARY UNITS OF TIME"
 your_score_msg_2_size = . - your_score_msg_2
+
+selection_msg .byte " << ===="
+selection_msg_size = . - selection_msg 
+
+title_screen_msg .byte "                                        "
+                 .byte "            ==trainsmission==           "
+                 .byte "                                        "
+                 .byte "     -gear up!                          "
+                 .byte "     -gear down!                        "
+                 .byte "     -faster than small town!           "
+                 .byte "                                        "
+                 .byte "                                        "
+                 .byte "                                        "
+                 .byte "                                        "
+                 .byte "                                        "
+                 .byte "                                        "
+                 .byte "                                        "
+                 .byte "                                        "
+                 .byte "                                        "
+                 .byte "	                   MUSIC BY bzyk @ 1997   "
+                 .byte " CODE & ART BY dextero, mcpgnz @ 2017   "
+                 .byte "                                        "
+                 .byte "                                        "
+              
