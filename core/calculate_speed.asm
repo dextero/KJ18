@@ -1,7 +1,6 @@
 ; =======================
 ; /entry/   =============
 
-slowdown_factor = 2
 slowdown_counter .ds 1
 
 noop:
@@ -14,7 +13,7 @@ accelerate:
 
     inc slowdown_counter
     lda slowdown_counter
-    cmp #slowdown_factor
+    cmp #SPEEDUP_FACTOR
     bne .accelerate_later
 
     lda #0
@@ -33,7 +32,7 @@ decelerate:
 
     dec slowdown_counter
     lda slowdown_counter
-    cmp #-slowdown_factor
+    cmp #-SLOWDOWN_FACTOR
     bne .decelerate_later
 
     lda #0
