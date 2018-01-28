@@ -14,12 +14,12 @@ init_sprite:
 
     lda #11
     sta $d026
-	
+    
     ; enable sprite 
     lda #%1111111
     sta $d015
 
-	; scale 
+    ; scale 
     lda #%00111110
     sta $d017
     sta $d01d
@@ -28,9 +28,9 @@ init_sprite:
     lda #%00001100
     sta $d01c
 
-	jsr .load_sprites
-	jsr .set_positions
-	jsr .set_base_colors
+    jsr .load_sprites
+    jsr .set_positions
+    jsr .set_base_colors
     rts
 
 clear_sprites:
@@ -52,18 +52,18 @@ clear_sprites:
     lda #01
     sta $d029
 
-	; pociag
+    ; pociag
     lda #00
     sta $d02a
 
-	; gearbcg
+    ; gearbcg
     lda #12
     sta $d02b
 
-	; tree
+    ; tree
     lda #9
     sta $d02c
-	rts
+    rts
 
 .load_sprites:
     lda #GEAR_SPRITE_DATA 
@@ -78,21 +78,21 @@ clear_sprites:
     lda #GEAR_SPRITE_DATA + 3
     sta $07fb
 
-	lda #GEAR_SPRITE_DATA + 4
+    lda #GEAR_SPRITE_DATA + 4
     sta $07fc
 
-	lda #GEAR_SPRITE_DATA + 5
+    lda #GEAR_SPRITE_DATA + 5
     sta $07fd
-	rts
+    rts
 
 .set_positions
-	lda #GEAR_LEVER_CENTER_X
+    lda #GEAR_LEVER_CENTER_X
     sta GEAR_LEVER_X	; sprite 1
 
     sec
     sbc #12
     sta SPRITE_2_X
-	sta $d008
+    sta $d008
 
     lda #GEAR_LEVER_CENTER_Y
     sta GEAR_LEVER_Y	
@@ -100,7 +100,7 @@ clear_sprites:
     sec
     sbc #12
     sta SPRITE_2_Y		
-	sta $d009
+    sta $d009
 
     ; ustaw krowke
     lda #$20
@@ -115,10 +115,10 @@ clear_sprites:
     lda #180
     sta $d007
 
-	;ustaw tree
-    lda #150
+    ;ustaw tree
+    lda #100
     sta $d00a
-    lda #120
+    lda #70
     sta $d00b
 
 	rts

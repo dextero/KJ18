@@ -63,11 +63,16 @@ SPRITE_COW_BIT = %00000100
 SPRITE_2_X = $d002
 SPRITE_2_Y = $d003
 
+SPRITE_3_X = $d004
+SPRITE_3_Y = $d005
+
+SPRITE_TREE_X = $d00a
+SPRITE_TREE_Y = $d00b
+
 ; =======================
 ; /variables/ ===========
 
-SPRITE_3_X = $d004
-SPRITE_3_Y = $d005
+TREE_UNDERFLOW = 2060
 
 JOYSTICK_STATE = 2048
 SPACE_STATE = 2049
@@ -81,6 +86,7 @@ LETHAL_SPEED = 100
 COW_SPRITE_SIZE = 32
 COW_START_X = 0
 COW_START_Y = 80
+
 
 GEAR_LEVER_X = $d000
 GEAR_LEVER_Y = $d001
@@ -136,6 +142,7 @@ init:
     sta CURRENT_SPEED
     sta SPACE_STATE
     sta TITLE_SELECTED
+	sta TREE_UNDERFLOW
 
     ;shifter
     lda #$04 
@@ -184,6 +191,7 @@ rest:
     jsr sync_screen
     jsr update_tracks
     jsr update_cow
+	jsr update_tree
     jsr draw_speed
     
     jsr is_finish_line_reached
@@ -211,14 +219,14 @@ rest:
     org SPRITE_ADDRESS + $80
     incbin "content/cow.spr"
 
-	org SPRITE_ADDRESS + $C0
+    org SPRITE_ADDRESS + $C0
     incbin "content/train.spr"
 
-	org SPRITE_ADDRESS + $100
+    org SPRITE_ADDRESS + $100
     incbin "content/gearbcg.spr"
 
-	org SPRITE_ADDRESS + $140
-	incbin "content/tree.spr"
+    org SPRITE_ADDRESS + $140
+    incbin "content/tree.spr"
 
     org $1000-$7e
     INCBIN "content/music.sid"
@@ -259,6 +267,7 @@ rest:
     include "core/sprite.asm"
     include "core/update_cow.asm"
     include "core/read_fire.asm"
+    include "core/update_tree.asm"
 
 speed_msg .byte "SPEED: ";
 speed_msg_size = . - speed_msg
