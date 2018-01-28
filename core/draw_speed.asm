@@ -10,6 +10,8 @@ draw_speed:
     LDX CURRENT_SPEED
     JSR $BDCD
 
+    write spaces, spaces_size
+
     clc
     ldx #23
     ldy #5

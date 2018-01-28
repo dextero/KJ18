@@ -144,7 +144,7 @@ get_gear_num:
     beq .get_gear_num_gear6
 
     ;neutral
-    lda #$ff
+    lda #0
     rts
 
 .get_gear_num_gear1:
@@ -171,20 +171,34 @@ get_gear_num:
 get_rpm_x100:
     jsr get_gear_num
     tax
+    tay
 
-    cpx #6
-    bcs .get_rpm_x100_neutral
+    cpx #0
+    beq .get_rpm_x100_zero
 
     lda CURRENT_SPEED
 
 .get_rpm_x100_loop:
     dex
     beq .get_rpm_x100_break
+
+    cmp #44
+    bcc .get_rpm_x100_zero
+
     sec
     sbc #44
+    jmp .get_rpm_x100_loop
 
-.get_rpm_x100_neutral:
-    lda #$ff
+.get_rpm_x100_zero:
+    lda #0
 
 .get_rpm_x100_break:
+    cpy #2
+    bcc .get_rpm_x100_ret
+
+    lsr
+    clc
+    adc #22
+
+.get_rpm_x100_ret:
     rts
