@@ -23,7 +23,7 @@ JOYSTICK_ADDR  = $DC00
 
 COLOR_MODE_RASTER = 220
 
-SPRITE_ADDRESS = $0e40
+SPRITE_ADDRESS = $0e00
 GEAR_SPRITE_DATA = SPRITE_ADDRESS / $40
 GEAR_LEVER_CENTER_X = $D5
 GEAR_LEVER_CENTER_Y = $DC
@@ -66,6 +66,7 @@ JOYSTICK_STATE = 2048
 SPACE_STATE = 2049
 CURRENT_SHIFTER_POS = 2050
 TITLE_SELECTED = 2051
+JOYSTICK_FIRE = 2052
 
 COW_UNDERFLOW = 2052
 COW_VISIBLE = 2053
@@ -113,7 +114,7 @@ QUOTIENT = NUMERATOR
 SKY_COLOR = 03
 FIRST_COLOR = 05
 TRACK_COLOR = $ff
-BORDER_COLOR = 15
+BORDER_COLOR = 11
 
 ; =======================
 ; /init/ ================
@@ -160,8 +161,8 @@ main:
 
 loop:
     ;handle movement
-    jsr read_space
-    lda SPACE_STATE
+    jsr read_fire
+    lda JOYSTICK_FIRE
     beq rest 
     jsr update_gearbox
 rest:
@@ -202,6 +203,12 @@ rest:
 	org SPRITE_ADDRESS + $C0
     incbin "content/train.spr"
 
+	org SPRITE_ADDRESS + $100
+    incbin "content/gearbcg.spr"
+
+	org SPRITE_ADDRESS + $140
+    incbin "content/gearbcg.spr"
+
     org $1000-$7e
     INCBIN "content/music.sid"
 
@@ -240,6 +247,7 @@ rest:
     include "core/update_distance_traveled.asm"
     include "core/sprite.asm"
     include "core/update_cow.asm"
+    include "core/read_fire.asm"
 
 speed_msg .byte "SPEED: ";
 speed_msg_size = . - speed_msg
