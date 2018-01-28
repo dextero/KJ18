@@ -271,8 +271,11 @@ rest:
 
 speed_msg .byte "SPEED: ";
 speed_msg_size = . - speed_msg
-gear_msg .byte " G: ";
-gear_msg_size = . - gear_msg
+rpm_msg .byte "RPM: ";
+rpm_msg_size = . - rpm_msg
+rpm_suffix .byte "00"
+rpm_suffix_size = . - rpm_suffix
+
 spaces .byte "     "
 spaces_size = . - spaces
 

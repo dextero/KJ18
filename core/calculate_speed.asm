@@ -126,3 +126,79 @@ calculate_speed:
 
 .neutral:
     jmp decelerate
+
+
+get_gear_num:
+    ldx CURRENT_SHIFTER_POS
+    cpx #0
+    beq .get_gear_num_gear1
+    cpx #1
+    beq .get_gear_num_gear3
+    cpx #2
+    beq .get_gear_num_gear5
+    cpx #6
+    beq .get_gear_num_gear2
+    cpx #7
+    beq .get_gear_num_gear4
+    cpx #8
+    beq .get_gear_num_gear6
+
+    ;neutral
+    lda #0
+    rts
+
+.get_gear_num_gear1:
+    lda #1
+    rts
+.get_gear_num_gear2:
+    lda #2
+    rts
+.get_gear_num_gear3:
+    lda #3
+    rts
+.get_gear_num_gear4:
+    lda #4
+    rts
+.get_gear_num_gear5:
+    lda #5
+    rts
+.get_gear_num_gear6:
+    lda #6
+    rts
+
+
+; returns: A - estimation of RPM / 100 
+get_rpm_x100:
+    jsr get_gear_num
+    tax
+    tay
+
+    cpx #0
+    beq .get_rpm_x100_zero
+
+    lda CURRENT_SPEED
+
+.get_rpm_x100_loop:
+    dex
+    beq .get_rpm_x100_break
+
+    cmp #44
+    bcc .get_rpm_x100_zero
+
+    sec
+    sbc #44
+    jmp .get_rpm_x100_loop
+
+.get_rpm_x100_zero:
+    lda #0
+
+.get_rpm_x100_break:
+    cpy #2
+    bcc .get_rpm_x100_ret
+
+    lsr
+    clc
+    adc #22
+
+.get_rpm_x100_ret:
+    rts
