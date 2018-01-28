@@ -23,7 +23,7 @@ JOYSTICK_ADDR  = $DC00
 
 COLOR_MODE_RASTER = 220
 
-SPRITE_ADDRESS = $0e80
+SPRITE_ADDRESS = $0ec0
 GEAR_SPRITE_DATA = SPRITE_ADDRESS / $40
 GEAR_LEVER_CENTER_X = $D5
 GEAR_LEVER_CENTER_Y = $DC
@@ -51,13 +51,19 @@ TRACK_UPPER_X = 18
 TRACK_UPPER_WIDTH = 1
 LINE_SKEW = 2
 
+SPRITE_2_X = $d002
+SPRITE_2_Y = $d003
+
 ; =======================
 ; /variables/ ===========
 
-CURRENT_SHIFTER_POS = 2050
+SPRITE_3_X = $d004
+SPRITE_3_Y = $d005
 
 JOYSTICK_STATE = 2048
 SPACE_STATE = 2049
+CURRENT_SHIFTER_POS = 2050
+COW_UNDERFLOW = 2051
 
 GEAR_LEVER_X = $d000
 GEAR_LEVER_Y = $d001
@@ -156,6 +162,7 @@ rest:
 
     jsr sync_screen
     jsr update_tracks
+    jsr update_cow
     jsr draw_speed
     
     jsr is_finish_line_reached
@@ -193,6 +200,7 @@ rest:
     include "core/highscore_screen.asm"
     include "core/update_distance_traveled.asm"
     include "core/sprite.asm"
+    include "core/update_cow.asm"
 
 ; =======================
 ; /data/ ================
@@ -202,6 +210,9 @@ rest:
 
     org SPRITE_ADDRESS + $40
     incbin "content/gearbox.spr"
+
+    org SPRITE_ADDRESS + $80
+    incbin "content/muu.spr"
 
     org $1000-$7e
     INCBIN "content/music.sid"
