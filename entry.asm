@@ -218,14 +218,16 @@ spaces_size = . - spaces
 title_msg	.byte "maly penis farme mial, ia, ia ou"
 title_msg_size = . - title_msg
 
-highscore_msg	.byte "STUFF DELIVERED"
+highscore_msg	.byte "stuff delivered"
 highscore_msg_size = . - highscore_msg
 
-your_score_msg_1 .byte "You trainsmitted some stuff in "
+your_score_msg_1 .byte "yOU TRAINSMITTED SOME STUFF IN"
 your_score_msg_1_size = . - your_score_msg_1
 
-your_score_msg_2 .byte " arbitrary units of time"
+your_score_msg_2 .byte "ARBITRARY UNITS OF TIME"
 your_score_msg_2_size = . - your_score_msg_2
 
-lowscore_msg .byte "You were embarrasingly slow to deliver the stuff."
-lowscore_msg_size = . - lowscore_msg
+lowscore_msg_1 .byte "yOU WERE EMBARRASINGLY SLOW"
+lowscore_msg_1_size = . - lowscore_msg_1
+lowscore_msg_2 .byte "TO DELIVER THE STUFF"
+lowscore_msg_2_size = . - lowscore_msg_2
