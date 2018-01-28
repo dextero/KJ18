@@ -66,7 +66,7 @@ accelerate_if_speed_between:
 ; BUT if speed == 255 and would accelerate OR speed == 0 and would decelerate, do nothing
 ; otherwise, decelerate
 calculate_speed:
-    lda SPACE_STATE
+    lda JOYSTICK_FIRE
     beq .clutch_up
 
     jmp decelerate

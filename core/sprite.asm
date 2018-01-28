@@ -6,7 +6,7 @@ init_sprite:
     ; sprite base colors
 
     ; lever
-    lda #4
+    lda #6
     sta $d027
 
     ; gearbox

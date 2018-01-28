@@ -66,6 +66,7 @@ JOYSTICK_STATE = 2048
 SPACE_STATE = 2049
 CURRENT_SHIFTER_POS = 2050
 TITLE_SELECTED = 2051
+JOYSTICK_FIRE = 2052
 
 COW_UNDERFLOW = 2052
 COW_VISIBLE = 2053
@@ -113,7 +114,7 @@ QUOTIENT = NUMERATOR
 SKY_COLOR = 03
 FIRST_COLOR = 05
 TRACK_COLOR = $ff
-BORDER_COLOR = 15
+BORDER_COLOR = 11
 
 ; =======================
 ; /init/ ================
@@ -160,8 +161,8 @@ main:
 
 loop:
     ;handle movement
-    jsr read_space
-    lda SPACE_STATE
+    jsr read_fire
+    lda JOYSTICK_FIRE
     beq rest 
     jsr update_gearbox
 rest:
@@ -240,6 +241,7 @@ rest:
     include "core/update_distance_traveled.asm"
     include "core/sprite.asm"
     include "core/update_cow.asm"
+    include "core/read_fire.asm"
 
 speed_msg .byte "SPEED: ";
 speed_msg_size = . - speed_msg

@@ -2,8 +2,8 @@ draw_speed:
     ; WTF IS GOING ON HERE
     ; WHY DOES THAT WORK WITH 240 AND 25
     clc
-    ldx #240
-    ldy #25
+    ldx #22;#240
+    ldy #5;#25
     jsr $fff0
 
     write speed_msg, speed_msg_size
