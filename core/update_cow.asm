@@ -1,7 +1,6 @@
 cow_enable_timeout .ds 2
 border_color_timeout .ds 1
 prev_border_color .ds 1
-COW_TIMEOUT = $0200
 
 
 flash_border:
@@ -9,7 +8,7 @@ flash_border:
     lda $d020
     sta prev_border_color
     and #$f0
-    ora #$02
+    ora #$01
     sta $d020
 
     ; 15 ticks = 0.3s
