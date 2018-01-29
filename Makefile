@@ -1,10 +1,12 @@
-LD_LIBRARY_PATH = $(HOME)/tools/wav-prg-4.2.1/libaudiotap 
+DASM = $(shell $(CURDIR)/tools/get-dasm)
 
 default: clean entry.prg
 
-%.prg: %.asm
-	$(HOME)/tools/dasm/dasm.Linux.x86 $^ -o$@ -v3
-	@ls -l $@
-
+.PHONY: clean
 clean:
 	rm -f *.prg
+
+%.prg: %.asm $(DASM)
+	$(DASM) "$<" -o"$@" -v3
+	# on error dasm returns 0 but produces 0-size output
+	[ -s "$@" ]
