@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+set -e
+
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
+DASM_ZIP_URL=https://10gbps-io.dl.sourceforge.net/project/dasm-dillon/dasm-dillon/2.20.11/dasm-2.20.11-2014.03.04-binaries.zip
+DASM_ZIP_NAME=dasm.zip
+DASM_ZIP_DIR="$SCRIPT_DIR/dasm"
+DASM_ZIP_BINARY="$DASM_ZIP_DIR/dasm.Linux.x86"
+
+DASM_GIT_URL=https://github.com/munsie/dasm
+DASM_GIT_DIR="$SCRIPT_DIR/dasm-source"
+DASM_GIT_BINARY="$DASM_GIT_DIR/bin/dasm"
+
+log() {
+    echo "$@" >&2
+}
+
+get-dasm-zip() {
+    wget -O "$SCRIPT_DIR/$DASM_ZIP_NAME" "$DASM_ZIP_URL" >&2
+    unzip -d "$SCRIPT_DIR/$DASM_ZIP_DIR" "$SCRIPT_DIR/$DASM_ZIP_NAME" >&2
+    [ -x "$SCRIPT_DIR/$DASM_ZIP_BINARY" ]
+}
+
+compile-dasm() {
+    git clone "$DASM_GIT_URL" "$SCRIPT_DIR/$DASM_GIT_DIR" >&2
+    make -C "$DASM_GIT_DIR" >&2
+    [ -x "$SCRIPT_DIR/$DASM_GIT_BINARY" ]
+}
+
+# if dasm in PATH, we're done
+if which dasm || which "$DASM_ZIP_BINARY" || which "$DASM_GIT_BINARY"; then
+    exit 0
+fi
+log "$0: dasm not found!"
+
+# try to download binary dasm
+log "$0: trying to download .zip..."
+if get-dasm-zip; then
+    echo "$SCRIPT_DIR/$DASM_ZIP_BINARY"
+    exit 0
+fi
+log "$0: could not get dasm from .zip!"
+
+# as a final fallback, try to clone repo & compile
+log "$0: trying to compile dasm from sources..."
+if compile-dasm; then
+    echo "$SCRIPT_DIR/$DASM_GIT_BINARY"
+    exit 0
+fi
+log "$0: could not compile dasm from sources!"
+
+log "$0: Could not retrieve dasm, aborting!" >&2
+log "$0: Try downloading manually from http://dasm-dillon.sourceforge.net/" >&2
+exit 1
