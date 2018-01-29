@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+set -e
+
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
+VICE_SOURCE_URL=https://10gbps-io.dl.sourceforge.net/project/vice-emu/releases/vice-3.1.tar.gz
+VICE_SOURCE_ARCHIVE_NAME="$SCRIPT_DIR/vice.tgz"
+VICE_INSTALL_DIR="$SCRIPT_DIR/vice-install"
+VICE_BINARY="$VICE_INSTALL_DIR/bin/x64"
+
+log() {
+    echo "$@" >&2
+}
+
+compile-vice() {
+    [ -f "$VICE_SOURCE_ARCHIVE_NAME" ] || wget -O "$VICE_SOURCE_ARCHIVE_NAME" "$VICE_SOURCE_URL" >&2
+    tar -C "$SCRIPT_DIR" -xf "$VICE_SOURCE_ARCHIVE_NAME" >&2
+    DIR_NAME="$(tar tf "$VICE_SOURCE_ARCHIVE_NAME" | head -1)"
+    pushd "$SCRIPT_DIR/$DIR_NAME"
+        ./configure --prefix="$VICE_INSTALL_DIR" >&2
+        make x64 >&2
+        make install >&2
+    popd
+    [ -x "$VICE_BINARY" ]
+}
+
+if which x64 || which "$VICE_BINARY"; then
+    exit 0
+fi
+log "$0: x64 executable not found!"
+log "$0: please check for vice-emu package (or similar) in your distro "
+log "$0: repositories and install it if available, then hit ENTER to continue"
+read
+
+if which x64; then
+    exit 0
+fi
+
+log "$0: x64 still not found in PATH"
+
+while [ -z "$TRY_COMPILE" ]; do
+    log -n "$0: Should I try to compile VICE emulator from sources? [Y/n] "
+    read INPUT
+
+    case "$INPUT" in
+        ''|y|Y) TRY_COMPILE=1 ;;
+        n|N) TRY_COMPILE=0 ;;
+        *) log "$INPUT is not a valid option" ;;
+    esac
+done
+
+if [ "$TRY_COMPILE" == "1" ]; then
+    log "$0: trying to compile vice from sources..."
+    if compile-vice; then
+        echo "$VICE_BINARY"
+        exit 0
+    fi
+    log "$0: could not compile vice from sources!"
+fi
+
+log '$0: Could not retrieve vice, aborting!'
+log '$0: Check your distribution repositories for VICE emulator or try downloading'
+log '$0: manually from http://vice-emu.sourceforge.net/'
+exit 1
