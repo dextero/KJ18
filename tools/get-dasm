@@ -19,14 +19,14 @@ log() {
 
 get-dasm-zip() {
     wget -O "$SCRIPT_DIR/$DASM_ZIP_NAME" "$DASM_ZIP_URL" >&2
-    unzip -d "$SCRIPT_DIR/$DASM_ZIP_DIR" "$SCRIPT_DIR/$DASM_ZIP_NAME" >&2
-    [ -x "$SCRIPT_DIR/$DASM_ZIP_BINARY" ]
+    unzip -d "$DASM_ZIP_DIR" "$SCRIPT_DIR/$DASM_ZIP_NAME" >&2
+    [ -x "$DASM_ZIP_BINARY" ]
 }
 
 compile-dasm() {
     git clone "$DASM_GIT_URL" "$SCRIPT_DIR/$DASM_GIT_DIR" >&2
     make -C "$DASM_GIT_DIR" >&2
-    [ -x "$SCRIPT_DIR/$DASM_GIT_BINARY" ]
+    [ -x "$DASM_GIT_BINARY" ]
 }
 
 # if dasm in PATH, we're done
@@ -38,7 +38,7 @@ log "$0: dasm not found!"
 # try to download binary dasm
 log "$0: trying to download .zip..."
 if get-dasm-zip; then
-    echo "$SCRIPT_DIR/$DASM_ZIP_BINARY"
+    echo "$DASM_ZIP_BINARY"
     exit 0
 fi
 log "$0: could not get dasm from .zip!"
@@ -46,7 +46,7 @@ log "$0: could not get dasm from .zip!"
 # as a final fallback, try to clone repo & compile
 log "$0: trying to compile dasm from sources..."
 if compile-dasm; then
-    echo "$SCRIPT_DIR/$DASM_GIT_BINARY"
+    echo "$DASM_GIT_BINARY"
     exit 0
 fi
 log "$0: could not compile dasm from sources!"

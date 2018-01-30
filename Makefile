@@ -11,7 +11,11 @@ clean:
 	# on error dasm returns 0 but produces 0-size output
 	[ -s "$@" ]
 
-run: $(VICE)
+.PHONY: vice
+vice:
+	@$(CURDIR)/tools/get-vice
+
+run: vice game
 	@echo "*****************************"
 	@echo "To run the game, type:"
 	@echo ""
@@ -19,5 +23,4 @@ run: $(VICE)
 	@echo ""
 	@echo "in the emulator and hit ENTER"
 	@echo "*****************************"
-
 	@$(shell $(CURDIR)/tools/get-vice) entry.prg >/dev/null
