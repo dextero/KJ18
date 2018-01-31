@@ -19,7 +19,7 @@ title_screen:
     lda title_screen_msg
     jsr draw_screen_text
 
-    jsr wait_for_space
+    wait_for_key KEY_SPACE
     rts
 
 

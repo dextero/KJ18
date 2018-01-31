@@ -39,7 +39,7 @@ loaddccimage:
     inx
     bne loaddccimage
 
-    jsr wait_for_space
+    wait_for_key KEY_SPACE
 
     jsr set_bank_one
     jsr text_mode

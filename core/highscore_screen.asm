@@ -37,6 +37,6 @@ highscore_screen:
     cpx #highscore_msg_size
     bne .setcolor
 
-    jsr wait_for_space
+    wait_for_key KEY_SPACE
 
     rts

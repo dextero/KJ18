@@ -3,6 +3,7 @@
 
     include "core/memory.asm"
     include "core/is_key_down.asm"
+    include "core/wait_for_key.asm"
 
 ; =======================
 ; /consts/ ===============
@@ -345,6 +346,7 @@ rest:
     include "core/read_fire.asm"
     include "core/update_tree.asm"
     include "core/is_key_down_impl.asm"
+    include "core/wait_for_key_impl.asm"
 
 speed_msg .byte "SPEED: ";
 speed_msg_size = . - speed_msg
