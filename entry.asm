@@ -2,6 +2,7 @@
     org $0810
 
     include "core/memory.asm"
+    include "core/is_key_down.asm"
 
 ; =======================
 ; /consts/ ===============
@@ -68,6 +69,76 @@ SPRITE_3_Y = $d005
 
 SPRITE_TREE_X = $d00a
 SPRITE_TREE_Y = $d00b
+
+CIA1_PORT_REG_A = $dc00
+CIA1_PORT_REG_B = $dc01
+CIA1_DATA_DIR_REG_A = $dc02
+CIA1_DATA_DIR_REG_B = $dc03
+
+KEY_DELETE     = %000000
+KEY_RETURN     = %000001
+KEY_CRSR_RT    = %000010
+KEY_F7         = %000011
+KEY_F1         = %000100
+KEY_F3         = %000101
+KEY_F5         = %000110
+KEY_CRSR_DN    = %000111
+KEY_3          = %001000
+KEY_W          = %001001
+KEY_A          = %001010
+KEY_4          = %001011
+KEY_Z          = %001100
+KEY_S          = %001101
+KEY_E          = %001110
+KEY_L_SHIFT    = %001111
+KEY_5          = %010000
+KEY_R          = %010001
+KEY_D          = %010010
+KEY_6          = %010011
+KEY_C          = %010100
+KEY_F          = %010101
+KEY_T          = %010110
+KEY_X          = %010111
+KEY_7          = %011000
+KEY_Y          = %011001
+KEY_G          = %011010
+KEY_8          = %011011
+KEY_B          = %011100
+KEY_H          = %011101
+KEY_U          = %011110
+KEY_V          = %011111
+KEY_9          = %100000
+KEY_I          = %100001
+KEY_J          = %100010
+KEY_0          = %100011
+KEY_M          = %100100
+KEY_K          = %100101
+KEY_O          = %100110
+KEY_N          = %100111
+KEY_PLUS       = %101000
+KEY_P          = %101001
+KEY_L          = %101010
+KEY_MINUS      = %101011
+KEY_DOT        = %101100
+KEY_COLON      = %101101
+KEY_AT         = %101110
+KEY_COMMA      = %101111
+KEY_POUND      = %110000
+KEY_ASTERISK   = %110001
+KEY_SEMICOLON  = %110010
+KEY_HOME       = %110011
+KEY_R_SHIFT    = %110100
+KEY_EQUALS     = %110101
+KEY_CARET      = %110110
+KEY_SLASH      = %110111
+KEY_1          = %111000
+KEY_ARROW_LEFT = %111001
+KEY_CTRL       = %111010
+KEY_2          = %111011
+KEY_SPACE      = %111100
+KEY_SUPER      = %111101
+KEY_Q          = %111110
+KEY_STOP       = %111111
 
 ; =======================
 ; /variables/ ===========
@@ -154,11 +225,13 @@ init:
     lda #TRACK_COLOR
     sta SCREEN_LINE_COLOR
 
+    jsr clear_sprites
+    jsr disable_interrupts
+
 ; =======================
 ; /methods/   ===========
 
 main: 
-
     jsr creators_screen
     jsr title_screen
 
@@ -186,13 +259,16 @@ loop:
     jsr update_gearbox
 rest:
 
+    is_key_down KEY_R
+    beq init
+
     jsr calculate_speed
     jsr update_distance_traveled
 
     jsr sync_screen
     jsr update_tracks
     jsr update_cow
-	jsr update_tree
+    jsr update_tree
     jsr draw_speed
     
     jsr is_finish_line_reached
@@ -201,7 +277,6 @@ rest:
     bne loop
 
     jsr clear_sprites
-
     jsr disable_interrupts
     jsr timer_get_elapsed
     jsr highscore_screen
@@ -269,6 +344,7 @@ rest:
     include "core/update_cow.asm"
     include "core/read_fire.asm"
     include "core/update_tree.asm"
+    include "core/is_key_down_impl.asm"
 
 speed_msg .byte "SPEED: ";
 speed_msg_size = . - speed_msg
