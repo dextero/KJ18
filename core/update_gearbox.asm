@@ -6,6 +6,9 @@
 
 update_gearbox:
     ; check if the joystick state changed
+    lda #%10000000
+    sta CIA1_DATA_DIR_REG_A
+
     lda JOYSTICK_ADDR
     cmp JOYSTICK_STATE
     beq return
