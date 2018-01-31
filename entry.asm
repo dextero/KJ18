@@ -338,7 +338,6 @@ rest:
     include "core/update_gearbox.asm"
     include "core/draw_speed.asm"
     include "core/timer.asm"
-    include "core/wait_for_space.asm"
     include "core/highscore_screen.asm"
     include "core/update_distance_traveled.asm"
     include "core/sprite.asm"
